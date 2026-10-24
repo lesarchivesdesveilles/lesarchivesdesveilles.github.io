@@ -1,1 +1,153 @@
 
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Archive 209 — Les Archives des Veilles</title>
+  <style>
+    :root {
+      --fond: #171119;
+      --carte: #30222e;
+      --or: #e8bb7e;
+      --texte: #f5e5cb;
+      --discret: #b59b86;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--fond);
+      color: var(--texte);
+      font-family: Arial, sans-serif;
+      line-height: 1.7;
+    }
+
+    .bandeau {
+      height: 240px;
+      background:
+        linear-gradient(to bottom, transparent 35%, #171119 100%),
+        url("miniatures/209.webp") center 42% / cover;
+    }
+
+    .page {
+      max-width: 900px;
+      margin: -35px auto 70px;
+      padding: 0 24px;
+      position: relative;
+    }
+
+    .retour {
+      color: var(--or);
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .numero {
+      color: var(--or);
+      font-size: 12px;
+      letter-spacing: 3px;
+      margin-top: 35px;
+    }
+
+    h1, h2 {
+      font-family: Georgia, serif;
+      font-weight: normal;
+    }
+
+    h1 {
+      font-size: clamp(30px, 5vw, 46px);
+      line-height: 1.2;
+      margin: 10px 0;
+    }
+
+    .sous-titre { color: var(--discret); }
+
+    .bloc {
+      background: var(--carte);
+      border: 1px solid #70533e;
+      border-radius: 12px;
+      padding: 25px;
+      margin-top: 28px;
+    }
+
+    h2 { color: var(--or); font-size: 23px; }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 25px;
+    }
+
+    .bouton {
+      display: inline-block;
+      background: #493349;
+      border: 1px solid #94704c;
+      border-radius: 8px;
+      color: var(--texte);
+      padding: 12px 18px;
+      text-decoration: none;
+    }
+
+    .bouton:hover { border-color: var(--or); }
+
+    .note {
+      font-size: 13px;
+      color: var(--discret);
+    }
+
+    @media (max-width: 600px) {
+      .bandeau { height: 170px; }
+      .page { padding: 0 18px; }
+      .bloc { padding: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="bandeau"></header>
+
+  <main class="page">
+    <a class="retour" href="index.html">← Retour à la bibliothèque</a>
+
+    <div class="numero">EXPLORATION Nº 209</div>
+    <h1>Le Livre d'Énoch</h1>
+    <div class="sous-titre">Le secret des Veilleurs</div>
+
+    <section class="bloc">
+      <h2>✦ À propos de cette exploration</h2>
+
+      <p>
+        Cette exploration aborde le Livre d'Énoch et les
+        Veilleurs à travers les perceptions rapportées
+        au cours d'une séance d'hypnose.
+      </p>
+
+      <p class="note">
+        Les récits et hypothèses présentés reflètent
+        les perceptions subjectives de la séance.
+        Ils ne constituent pas des faits établis.
+      </p>
+
+      <div class="actions">
+        <a class="bouton"
+           href="https://lesarchivesdesveilles.github.io/archives-des-veilles-visionneuse/?archive=209">
+          ✦ Voir les illustrations
+        </a>
+      </div>
+    </section>
+
+    <section class="bloc">
+      <h2>✦ Infographie de synthèse</h2>
+      <p>
+        Nous ajouterons ici l'infographie de synthèse
+        de cette exploration.
+      </p>
+    </section>
+  </main>
+
+</body>
+</html>
+
