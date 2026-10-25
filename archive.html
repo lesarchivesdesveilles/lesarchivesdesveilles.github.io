@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -113,23 +112,21 @@
 </head>
 <body>
 
+  <body>
+
   <header class="bandeau"></header>
 
   <main class="page">
     <a class="retour" href="index.html">← Retour à la bibliothèque</a>
 
-    <div class="numero">EXPLORATION Nº 209</div>
-    <h1>Le Livre d'Énoch</h1>
-    <div class="sous-titre">Le secret des Veilleurs</div>
+    <div class="numero" id="numero"></div>
+    <h1 id="titre"></h1>
+    <div class="sous-titre" id="sous-titre"></div>
 
     <section class="bloc">
       <h2>✦ À propos de cette exploration</h2>
 
-      <p>
-        Cette exploration aborde le Livre d'Énoch et les
-        Veilleurs à travers les perceptions rapportées
-        au cours d'une séance d'hypnose.
-      </p>
+      <div id="resume"></div>
 
       <p class="note">
         Les récits et hypothèses présentés reflètent
@@ -137,9 +134,10 @@
         Ils ne constituent pas des faits établis.
       </p>
 
+      <div id="source"></div>
+
       <div class="actions">
-        <a class="bouton"
-           href="https://lesarchivesdesveilles.github.io/archives-des-veilles-visionneuse/?archive=209">
+        <a class="bouton" id="visionneuse" href="#">
           ✦ Voir les illustrations
         </a>
       </div>
@@ -147,12 +145,109 @@
 
     <section class="bloc">
       <h2>✦ Infographie de synthèse</h2>
-      <p>
-        Nous ajouterons ici l'infographie de synthèse
-        de cette exploration.
-      </p>
+      <div id="synthese">
+        <p>Nous ajouterons ici l'infographie de synthèse de cette exploration.</p>
+      </div>
     </section>
   </main>
+
+  <script type="module">
+    const numero = new URLSearchParams(window.location.search).get("archive") || "209";
+
+    try {
+      const reponse = await fetch("archives.json");
+
+      if (!reponse.ok) {
+        throw new Error("Impossible de charger archives.json");
+      }
+
+      const archives = await reponse.json();
+      const archive = archives[numero];
+
+      if (!archive) {
+        throw new Error("Archive introuvable : " + numero);
+      }
+
+      document.title = `Archive ${numero} — Les Archives des Veilles`;
+
+      document.getElementById("numero").textContent =
+        `EXPLORATION Nº ${numero}`;
+
+      document.getElementById("titre").textContent = archive.titre || "";
+
+      document.getElementById("sous-titre").textContent =
+        archive.sousTitre || "";
+
+      if (archive.bandeau) {
+        document.querySelector(".bandeau").style.backgroundImage =
+          `linear-gradient(to bottom, transparent 55%, #171119 100%), url("${archive.bandeau}")`;
+      }
+
+      const resume = document.getElementById("resume");
+
+      if (archive.resume) {
+        archive.resume.split(/\n\s*\n/).forEach(paragraphe => {
+          const p = document.createElement("p");
+          p.textContent = paragraphe.trim();
+          resume.appendChild(p);
+        });
+      }
+
+      if (archive.source || archive.video) {
+        const source = document.getElementById("source");
+        const p = document.createElement("p");
+        p.className = "note";
+
+        p.appendChild(document.createTextNode("Source : "));
+
+        if (archive.video) {
+          const lien = document.createElement("a");
+          lien.href = archive.video;
+          lien.textContent = archive.source || "Voir la vidéo";
+          lien.target = "_blank";
+          lien.rel = "noopener noreferrer";
+          lien.style.color = "var(--or)";
+          p.appendChild(lien);
+        } else {
+          p.appendChild(document.createTextNode(archive.source));
+        }
+
+        source.appendChild(p);
+      }
+
+      const visionneuse = document.getElementById("visionneuse");
+
+      if (archive.visionneuse) {
+        visionneuse.href = archive.visionneuse;
+      } else {
+        visionneuse.style.display = "none";
+      }
+
+      if (archive.synthese) {
+        const image = document.createElement("img");
+        image.src = archive.synthese;
+        image.alt = `Infographie de synthèse de l'archive ${numero}`;
+        image.style.width = "100%";
+        image.style.height = "auto";
+        image.style.borderRadius = "8px";
+
+        document.getElementById("synthese").replaceChildren(image);
+      }
+
+    } catch (erreur) {
+      console.error(erreur);
+
+      document.getElementById("titre").textContent =
+        "Impossible de charger cette archive";
+
+      document.getElementById("resume").textContent =
+        "Vérifie que le fichier archives.json existe et contient cette archive.";
+
+      document.getElementById("visionneuse").style.display = "none";
+    }
+  </script>
+
+</body>
 
 </body>
 </html>
