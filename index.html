@@ -24,8 +24,32 @@
       line-height: 1.6;
     }
 
+    .bandeau-accueil {
+      width: 100%;
+      height: clamp(220px, 33vw, 500px);
+    
+      background-image:
+      linear-gradient(
+        to bottom,
+        transparent 65%,
+        #171119 100%
+      ),
+      url("bandeaux/accueil.webp");
+
+    background-position: center 35%;
+    background-size: cover;
+    background-repeat: no-repeat;
+  }
+
+@media (max-width: 600px) {
+  .bandeau-accueil {
+    height: 240px;
+    background-position: center 28%;
+  }
+}
+
     header {
-      padding: 65px 20px 45px;
+      padding: 25px 20px 45px;
       text-align: center;
       border-bottom: 1px solid #70533e;
     }
