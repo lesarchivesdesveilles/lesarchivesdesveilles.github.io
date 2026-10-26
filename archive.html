@@ -219,6 +219,10 @@
   </main>
 
   <script type="module">
+    
+    // Clé API Google Drive
+    const CLE_API = "AIzaSyCHfj7qDdgbXlpfDcWatMa8RwvgLb_EDx4";
+    
     const numero =
       new URLSearchParams(window.location.search)
         .get("archive") || "209";
@@ -267,22 +271,69 @@
       }
 
       // APERÇUS DES INFOGRAPHIES
-      const apercus = document.getElementById("apercus");
+    const apercus = document.getElementById("apercus");
 
-      if (Array.isArray(archive.apercus) &&
-          archive.apercus.length > 0) {
+// On conserve les aperçus manuels en secours
+let imagesApercu = Array.isArray(archive.apercus)
+  ? archive.apercus.slice(0, 3)
+  : [];
 
-        archive.apercus.slice(0, 3).forEach((chemin, index) => {
-          const image = document.createElement("img");
-          image.src = chemin;
-          image.alt =
-            `Aperçu ${index + 1} de l'archive ${numero}`;
-          image.loading = "lazy";
-          apercus.appendChild(image);
-        });
+try {
+  if (dossierPublication) {
+    const params = new URLSearchParams({
+      q: `'${dossierPublication}' in parents and trashed = false and mimeType = 'image/png'`,
+      fields: "nextPageToken,files(id,name)",
+      pageSize: "100",
+      key: CLE_API
+    });
 
-        apercus.hidden = false;
+    const fichiers = [];
+    let pageToken = "";
+
+    do {
+      if (pageToken) params.set("pageToken", pageToken);
+
+      const reponseDrive = await fetch(
+        "https://www.googleapis.com/drive/v3/files?" + params
+      );
+
+      if (!reponseDrive.ok) {
+        throw new Error("Erreur Google Drive");
       }
+
+      const donnees = await reponseDrive.json();
+      fichiers.push(...(donnees.files || []));
+      pageToken = donnees.nextPageToken || "";
+    } while (pageToken);
+
+    const planches = fichiers
+      .filter(f => /^\d+\.png$/i.test(f.name) && !/^00\.png$/i.test(f.name))
+      .sort((a, b) =>
+        a.name.localeCompare(b.name, "fr", { numeric: true })
+      )
+      .slice(0, 3);
+
+          if (planches.length > 0) {
+            imagesApercu = planches.map(f =>
+              `https://drive.google.com/thumbnail?id=${encodeURIComponent(f.id)}&sz=w600`
+            );
+          }
+        }
+      } catch (erreur) {
+        console.warn("Aperçus Drive indisponibles :", erreur);
+      }
+      
+      apercus.replaceChildren();
+      
+      imagesApercu.forEach((chemin, index) => {
+        const image = document.createElement("img");
+        image.src = chemin;
+        image.alt = `Aperçu ${index + 1} de l'archive ${numero}`;
+        image.loading = "lazy";
+        apercus.appendChild(image);
+      });
+      
+      apercus.hidden = imagesApercu.length === 0;
 
       // LIEN VERS LA VISIONNEUSE
       const visionneuse =
