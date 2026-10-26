@@ -233,6 +233,18 @@
       const archives = await reponse.json();
       const archive = archives[numero];
 
+      // Configuration de la visionneuse
+      const configReponse = await fetch(
+        "https://lesarchivesdesveilles.github.io/archives-des-veilles-visionneuse/archives.json"
+      );
+      
+      if (!configReponse.ok) {
+        throw new Error("Impossible de charger les dossiers Drive");
+      }
+      
+      const configVisionneuse = await configReponse.json();
+      const dossierPublication = configVisionneuse[numero]?.dossier;
+
       if (!archive) {
         throw new Error("Archive introuvable : " + numero);
       }
