@@ -1,9 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Archive 209 — Les Archives des Veilles</title>
+  <title>Les Archives des Veilles</title>
+
   <style>
     :root {
       --fond: #171119;
@@ -31,7 +33,6 @@
       background-image:
         linear-gradient(to bottom, transparent 55%, #171119 100%),
         url("bandeaux/209.webp");
-    
       background-position: center;
       background-size: cover;
       background-repeat: no-repeat;
@@ -78,13 +79,33 @@
       margin-top: 28px;
     }
 
-    h2 { color: var(--or); font-size: 23px; }
+    h2 {
+      color: var(--or);
+      font-size: 23px;
+      margin-top: 0;
+    }
+
+    .apercus {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin: 20px 0;
+    }
+
+    .apercus img {
+      width: 100%;
+      aspect-ratio: 9 / 16;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid #70533e;
+      display: block;
+    }
 
     .actions {
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
-      margin-top: 25px;
+      margin-top: 20px;
     }
 
     .bouton {
@@ -104,29 +125,79 @@
       color: var(--discret);
     }
 
+    details {
+      margin-top: 15px;
+    }
+
+    summary {
+      color: var(--or);
+      cursor: pointer;
+      padding: 10px 0;
+    }
+
+    summary:hover {
+      text-decoration: underline;
+    }
+
+    .synthese-image {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+
+    .synthese-lien {
+      display: block;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
     @media (max-width: 600px) {
       .page { padding: 0 18px; }
       .bloc { padding: 18px; }
+      .apercus { gap: 7px; }
     }
   </style>
 </head>
-<body>
 
-  <body>
+<body>
 
   <header class="bandeau"></header>
 
   <main class="page">
-    <a class="retour" href="index.html">← Retour à la bibliothèque</a>
+    <a class="retour" href="index.html">
+      ← Retour à la bibliothèque
+    </a>
 
     <div class="numero" id="numero"></div>
     <h1 id="titre"></h1>
     <div class="sous-titre" id="sous-titre"></div>
 
-    <section class="bloc">
-      <h2>✦ À propos de cette exploration</h2>
+    <!-- LES INFOGRAPHIES D'ABORD -->
+    <section class="bloc" id="bloc-infographies">
+      <h2>✦ Découvrir les infographies</h2>
 
-      <div id="resume"></div>
+      <div class="apercus" id="apercus" hidden></div>
+
+      <div class="actions">
+        <a class="bouton" id="visionneuse" href="#">
+          ✦ Explorer toutes les infographies
+        </a>
+      </div>
+    </section>
+
+    <!-- LE RÉCIT -->
+    <section class="bloc">
+      <h2>✦ Le récit de l'exploration</h2>
+
+      <div id="resume-intro"></div>
+
+      <details id="resume-details" hidden>
+        <summary>Lire le résumé complet</summary>
+        <div id="resume-suite"></div>
+      </details>
 
       <p class="note">
         Les récits et hypothèses présentés reflètent
@@ -135,24 +206,22 @@
       </p>
 
       <div id="source"></div>
-
-      <div class="actions">
-        <a class="bouton" id="visionneuse" href="#">
-          ✦ Voir les illustrations
-        </a>
-      </div>
     </section>
 
-    <section class="bloc">
+    <!-- LA SYNTHÈSE -->
+    <section class="bloc" id="bloc-synthese" hidden>
       <h2>✦ Infographie de synthèse</h2>
-      <div id="synthese">
-        <p>Nous ajouterons ici l'infographie de synthèse de cette exploration.</p>
-      </div>
+      <div id="synthese"></div>
+      <p class="note">
+        Cliquez sur l'image pour l'afficher en grand.
+      </p>
     </section>
   </main>
 
   <script type="module">
-    const numero = new URLSearchParams(window.location.search).get("archive") || "209";
+    const numero =
+      new URLSearchParams(window.location.search)
+        .get("archive") || "209";
 
     try {
       const reponse = await fetch("archives.json");
@@ -168,12 +237,14 @@
         throw new Error("Archive introuvable : " + numero);
       }
 
-      document.title = `Archive ${numero} — Les Archives des Veilles`;
+      document.title =
+        `Archive ${numero} — Les Archives des Veilles`;
 
       document.getElementById("numero").textContent =
         `EXPLORATION Nº ${numero}`;
 
-      document.getElementById("titre").textContent = archive.titre || "";
+      document.getElementById("titre").textContent =
+        archive.titre || "";
 
       document.getElementById("sous-titre").textContent =
         archive.sousTitre || "";
@@ -183,21 +254,70 @@
           `linear-gradient(to bottom, transparent 55%, #171119 100%), url("${archive.bandeau}")`;
       }
 
-      const resume = document.getElementById("resume");
+      // APERÇUS DES INFOGRAPHIES
+      const apercus = document.getElementById("apercus");
 
-      if (archive.resume) {
-        archive.resume.split(/\n\s*\n/).forEach(paragraphe => {
-          const p = document.createElement("p");
-          p.textContent = paragraphe.trim();
-          resume.appendChild(p);
+      if (Array.isArray(archive.apercus) &&
+          archive.apercus.length > 0) {
+
+        archive.apercus.slice(0, 3).forEach((chemin, index) => {
+          const image = document.createElement("img");
+          image.src = chemin;
+          image.alt =
+            `Aperçu ${index + 1} de l'archive ${numero}`;
+          image.loading = "lazy";
+          apercus.appendChild(image);
         });
+
+        apercus.hidden = false;
       }
 
+      // LIEN VERS LA VISIONNEUSE
+      const visionneuse =
+        document.getElementById("visionneuse");
+
+      if (archive.visionneuse) {
+        visionneuse.href = archive.visionneuse;
+      } else {
+        document.getElementById("bloc-infographies").hidden = true;
+      }
+
+      // RÉSUMÉ DÉPLIABLE
+      if (archive.resume) {
+        const paragraphes = archive.resume
+          .split(/\n\s*\n/)
+          .map(texte => texte.trim())
+          .filter(Boolean);
+
+        function ajouterParagraphe(conteneur, texte) {
+          const p = document.createElement("p");
+          p.textContent = texte;
+          conteneur.appendChild(p);
+        }
+
+        paragraphes.slice(0, 2).forEach(texte => {
+          ajouterParagraphe(
+            document.getElementById("resume-intro"),
+            texte
+          );
+        });
+
+        if (paragraphes.length > 2) {
+          paragraphes.slice(2).forEach(texte => {
+            ajouterParagraphe(
+              document.getElementById("resume-suite"),
+              texte
+            );
+          });
+
+          document.getElementById("resume-details").hidden = false;
+        }
+      }
+
+      // SOURCE ET VIDÉO
       if (archive.source || archive.video) {
-        const source = document.getElementById("source");
         const p = document.createElement("p");
         p.className = "note";
-
         p.appendChild(document.createTextNode("Source : "));
 
         if (archive.video) {
@@ -209,29 +329,35 @@
           lien.style.color = "var(--or)";
           p.appendChild(lien);
         } else {
-          p.appendChild(document.createTextNode(archive.source));
+          p.appendChild(
+            document.createTextNode(archive.source)
+          );
         }
 
-        source.appendChild(p);
+        document.getElementById("source").appendChild(p);
       }
 
-      const visionneuse = document.getElementById("visionneuse");
-
-      if (archive.visionneuse) {
-        visionneuse.href = archive.visionneuse;
-      } else {
-        visionneuse.style.display = "none";
-      }
-
+      // INFOGRAPHIE DE SYNTHÈSE
       if (archive.synthese) {
+        const lien = document.createElement("a");
+        lien.href = archive.synthese;
+        lien.target = "_blank";
+        lien.rel = "noopener noreferrer";
+        lien.className = "synthese-lien";
+
         const image = document.createElement("img");
         image.src = archive.synthese;
-        image.alt = `Infographie de synthèse de l'archive ${numero}`;
-        image.style.width = "100%";
-        image.style.height = "auto";
-        image.style.borderRadius = "8px";
+        image.alt =
+          `Infographie de synthèse de l'archive ${numero}`;
+        image.className = "synthese-image";
+        image.loading = "lazy";
 
-        document.getElementById("synthese").replaceChildren(image);
+        lien.appendChild(image);
+
+        document.getElementById("synthese")
+          .appendChild(lien);
+
+        document.getElementById("bloc-synthese").hidden = false;
       }
 
     } catch (erreur) {
@@ -240,15 +366,12 @@
       document.getElementById("titre").textContent =
         "Impossible de charger cette archive";
 
-      document.getElementById("resume").textContent =
+      document.getElementById("resume-intro").textContent =
         "Vérifie que le fichier archives.json existe et contient cette archive.";
 
-      document.getElementById("visionneuse").style.display = "none";
+      document.getElementById("bloc-infographies").hidden = true;
     }
   </script>
 
 </body>
-
-</body>
 </html>
-
