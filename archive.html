@@ -101,12 +101,7 @@
       display: block;
       cursor: zoom-in;
     }
-
-    .apercus + a {
-      display: table;
-      margin: 20px auto 0;
-    }
-    
+   
     .apercus img {
       display: block;
       width: 100%;
@@ -156,9 +151,10 @@
       }
     }
 
-    .actions {
+   .actions {
       display: flex;
       flex-wrap: wrap;
+      justify-content: center;
       gap: 12px;
       margin-top: 20px;
     }
@@ -445,15 +441,15 @@ try {
           conteneur.appendChild(p);
         }
 
-        paragraphes.slice(0, 2).forEach(texte => {
+        paragraphes.slice(0, 1).forEach(texte => {
           ajouterParagraphe(
             document.getElementById("resume-intro"),
             texte
           );
         });
 
-        if (paragraphes.length > 2) {
-          paragraphes.slice(2).forEach(texte => {
+        if (paragraphes.length > 1) {
+          paragraphes.slice(1).forEach(texte => {
             ajouterParagraphe(
               document.getElementById("resume-suite"),
               texte
