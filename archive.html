@@ -483,6 +483,36 @@ try {
         document.getElementById("source").appendChild(p);
       }
 
+      // Recherche automatique de Finale.png dans le dossier Publication
+      if (dossierPublication) {
+        try {
+          const paramsFinale = new URLSearchParams({
+            q: `'${dossierPublication}' in parents and trashed = false and name = 'Finale.png'`,
+            fields: "files(id,name)",
+            pageSize: "10",
+            key: CLE_API
+          });
+      
+          const reponseFinale = await fetch(
+            "https://www.googleapis.com/drive/v3/files?" + paramsFinale
+          );
+      
+          if (!reponseFinale.ok) {
+            throw new Error("Impossible de charger Finale.png");
+          }
+      
+          const donneesFinale = await reponseFinale.json();
+          const finale = donneesFinale.files?.[0];
+      
+          if (finale) {
+            archive.synthese =
+              `https://drive.google.com/thumbnail?id=${encodeURIComponent(finale.id)}&sz=w1600`;
+          }
+        } catch (erreur) {
+          console.warn("Synthèse indisponible :", erreur);
+        }
+      }
+
       // INFOGRAPHIE DE SYNTHÈSE
       if (archive.synthese) {
         const lien = document.createElement("a");
