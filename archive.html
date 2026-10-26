@@ -325,12 +325,20 @@ try {
       
       apercus.replaceChildren();
       
-      imagesApercu.forEach((chemin, index) => {
+     imagesApercu.forEach((chemin, index) => {
+        const lien = document.createElement("a");
+        lien.href = chemin.replace(/sz=w\d+/, "sz=w1600");
+        lien.target = "_blank";
+        lien.rel = "noopener noreferrer";
+        lien.title = "Agrandir la planche " + (index + 1);
+      
         const image = document.createElement("img");
         image.src = chemin;
         image.alt = `Aperçu ${index + 1} de l'archive ${numero}`;
         image.loading = "lazy";
-        apercus.appendChild(image);
+      
+        lien.appendChild(image);
+        apercus.appendChild(lien);
       });
       
       apercus.hidden = imagesApercu.length === 0;
