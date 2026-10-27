@@ -355,10 +355,6 @@
       if (e.target === fond) fond.remove();
     });
   
-    fond.append(image, fermer);
-    document.body.appendChild(fond);
-  }
-    
     const numero =
       new URLSearchParams(window.location.search)
         .get("archive") || "209";
@@ -472,9 +468,6 @@ try {
           );
         });
         
-          fond.append(grandeImage, fermer);
-          document.body.appendChild(fond);
-        });
         lien.rel = "noopener noreferrer";
         lien.title = "Agrandir la planche " + (index + 1);
       
