@@ -477,12 +477,18 @@ try {
         lien.title = "Agrandir la planche " + (index + 1);
       
         const image = document.createElement("img");
-        image.src = chemin;
+
+        const numeroPlanche = String(index + 1).padStart(2, "0");
+        const miniatureWebP = `miniatures/${numero}-${numeroPlanche}.webp`;
+        
+        image.src = miniatureWebP;
+        image.onerror = () => {
+          image.onerror = null;
+          image.src = chemin;
+        };
+        
         image.alt = `Aperçu ${index + 1} de l'archive ${numero}`;
         image.loading = "lazy";
-      
-        lien.appendChild(image);
-        apercus.appendChild(lien);
       });
       
       apercus.hidden = imagesApercu.length === 0;
