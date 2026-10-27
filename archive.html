@@ -273,6 +273,91 @@
     
     // Clé API Google Drive
     const CLE_API = "AIzaSyAOworlnq91zYdAVyTkLomMDPDJFlu_fDE";
+
+    function ouvrirImageZoomable(source, description) {
+    const fond = document.createElement("div");
+    fond.className = "agrandissement";
+  
+    const image = document.createElement("img");
+    image.src = source;
+    image.alt = description;
+    image.draggable = false;
+    image.style.transformOrigin = "center center";
+    image.style.cursor = "zoom-in";
+    image.style.touchAction = "none";
+  
+    const fermer = document.createElement("button");
+    fermer.className = "fermer-agrandissement";
+    fermer.textContent = "×";
+    fermer.setAttribute("aria-label", "Fermer l'image");
+  
+    let zoom = 1;
+    let x = 0;
+    let y = 0;
+    let departX = 0;
+    let departY = 0;
+    let glissement = false;
+  
+    function actualiser() {
+      image.style.transform =
+        `translate(${x}px, ${y}px) scale(${zoom})`;
+      image.style.cursor = zoom > 1 ? "grab" : "zoom-in";
+    }
+  
+    image.addEventListener("wheel", (e) => {
+      e.preventDefault();
+      zoom = Math.max(1, Math.min(5,
+        zoom * (e.deltaY < 0 ? 1.15 : 1 / 1.15)
+      ));
+      if (zoom === 1) {
+        x = 0;
+        y = 0;
+      }
+      actualiser();
+    }, { passive: false });
+  
+    image.addEventListener("pointerdown", (e) => {
+      if (e.pointerType === "touch" || zoom <= 1) return;
+      glissement = true;
+      departX = e.clientX - x;
+      departY = e.clientY - y;
+      image.setPointerCapture(e.pointerId);
+      image.style.cursor = "grabbing";
+    });
+  
+    image.addEventListener("pointermove", (e) => {
+      if (!glissement) return;
+      x = e.clientX - departX;
+      y = e.clientY - departY;
+      actualiser();
+    });
+  
+    image.addEventListener("pointerup", () => {
+      glissement = false;
+      actualiser();
+    });
+  
+    image.addEventListener("pointercancel", () => {
+      glissement = false;
+      actualiser();
+    });
+  
+    image.addEventListener("dblclick", () => {
+      zoom = 1;
+      x = 0;
+      y = 0;
+      actualiser();
+    });
+  
+    fermer.addEventListener("click", () => fond.remove());
+  
+    fond.addEventListener("click", (e) => {
+      if (e.target === fond) fond.remove();
+    });
+  
+    fond.append(image, fermer);
+    document.body.appendChild(fond);
+  }
     
     const numero =
       new URLSearchParams(window.location.search)
@@ -381,25 +466,11 @@ try {
         lien.href = chemin.replace(/sz=w\d+/, "sz=w1600");
         lien.addEventListener("click", (evenement) => {
           evenement.preventDefault();
-        
-          const fond = document.createElement("div");
-          fond.className = "agrandissement";
-        
-          const grandeImage = document.createElement("img");
-          grandeImage.src = lien.href;
-          grandeImage.alt = image.alt;
-        
-          const fermer = document.createElement("button");
-          fermer.className = "fermer-agrandissement";
-          fermer.textContent = "×";
-          fermer.setAttribute("aria-label", "Fermer l'image");
-        
-          const fermerFenetre = () => fond.remove();
-        
-          fermer.addEventListener("click", fermerFenetre);
-          fond.addEventListener("click", (e) => {
-            if (e.target === fond) fermerFenetre();
-          });
+          ouvrirImageZoomable(
+            lien.href,
+            `Aperçu ${index + 1} de l'archive ${numero}`
+          );
+        });
         
           fond.append(grandeImage, fermer);
           document.body.appendChild(fond);
@@ -527,26 +598,12 @@ try {
         image.loading = "lazy";
     
         lien.addEventListener("click", (evenement) => {
-          evenement.preventDefault();
-
-        const fond = document.createElement("div");
-        fond.className = "agrandissement";
-  
-        const grandeImage = document.createElement("img");
-        grandeImage.src = archive.synthese.replace(/sz=w\d+/, "sz=w1600");
-        grandeImage.alt = image.alt;
-  
-        const fermer = document.createElement("button");
-        fermer.className = "fermer-agrandissement";
-        fermer.textContent = "×";
-        fermer.setAttribute("aria-label", "Fermer l'image");
-  
-        const fermerFenetre = () => fond.remove();
-  
-        fermer.addEventListener("click", fermerFenetre);
-        fond.addEventListener("click", (e) => {
-          if (e.target === fond) fermerFenetre();
-        });
+        evenement.preventDefault();
+        ouvrirImageZoomable(
+          archive.synthese.replace(/sz=w\d+/, "sz=w1600"),
+          image.alt
+        );
+      });
 
         fond.append(grandeImage, fermer);
         document.body.appendChild(fond);
