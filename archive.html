@@ -354,7 +354,11 @@
     fond.addEventListener("click", (e) => {
       if (e.target === fond) fond.remove();
     });
-  
+
+    fond.append(image, fermer);
+    document.body.appendChild(fond);
+  }
+
     const numero =
       new URLSearchParams(window.location.search)
         .get("archive") || "209";
@@ -598,10 +602,6 @@ try {
         );
       });
 
-        fond.append(grandeImage, fermer);
-        document.body.appendChild(fond);
-      });
-  
       lien.appendChild(image);
   
       document.getElementById("synthese").appendChild(lien);
