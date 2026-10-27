@@ -407,91 +407,96 @@
           `linear-gradient(to bottom, transparent 55%, #171119 100%), url("${archive.bandeau}")`;
       }
 
-      // APERÇUS DES INFOGRAPHIES
-    const apercus = document.getElementById("apercus");
+      // APERÇUS : WebP GitHub immédiatement, PNG Drive en arrière-plan
+      const apercus = document.getElementById("apercus");
+      const liensApercu = [];
+      const secoursApercu = Array.isArray(archive.apercus)
+        ? archive.apercus.slice(0, 3)
+        : [];
 
-// On conserve les aperçus manuels en secours
-let imagesApercu = Array.isArray(archive.apercus)
-  ? archive.apercus.slice(0, 3)
-  : [];
-
-try {
-  if (dossierPublication) {
-    const params = new URLSearchParams({
-      q: `'${dossierPublication}' in parents and trashed = false and mimeType = 'image/png'`,
-      fields: "nextPageToken,files(id,name)",
-      pageSize: "100",
-      key: CLE_API
-    });
-
-    const fichiers = [];
-    let pageToken = "";
-
-    do {
-      if (pageToken) params.set("pageToken", pageToken);
-
-      const reponseDrive = await fetch(
-        "https://www.googleapis.com/drive/v3/files?" + params
-      );
-
-      if (!reponseDrive.ok) {
-        throw new Error("Erreur Google Drive");
-      }
-
-      const donnees = await reponseDrive.json();
-      fichiers.push(...(donnees.files || []));
-      pageToken = donnees.nextPageToken || "";
-    } while (pageToken);
-
-    const planches = fichiers
-      .filter(f => /^\d+\.png$/i.test(f.name) && !/^00\.png$/i.test(f.name))
-      .sort((a, b) =>
-        a.name.localeCompare(b.name, "fr", { numeric: true })
-      )
-      .slice(0, 3);
-
-          if (planches.length > 0) {
-            imagesApercu = planches.map(f =>
-              `https://drive.google.com/thumbnail?id=${encodeURIComponent(f.id)}&sz=w600`
-            );
-          }
-        }
-      } catch (erreur) {
-        console.warn("Aperçus Drive indisponibles :", erreur);
-      }
-      
       apercus.replaceChildren();
-      
-     imagesApercu.forEach((chemin, index) => {
-        const lien = document.createElement("a");
-        lien.href = chemin.replace(/sz=w\d+/, "sz=w1600");
-        lien.addEventListener("click", (evenement) => {
-          evenement.preventDefault();
-          ouvrirImageZoomable(
-            lien.href,
-            `Aperçu ${index + 1} de l'archive ${numero}`
-          );
-        });
-        
-        lien.rel = "noopener noreferrer";
-        lien.title = "Agrandir la planche " + (index + 1);
-      
-        const image = document.createElement("img");
 
+      for (let index = 0; index < 3; index++) {
         const numeroPlanche = String(index + 1).padStart(2, "0");
         const miniatureWebP = `miniatures/${numero}-${numeroPlanche}.webp`;
-        
+        const lien = document.createElement("a");
+        lien.href = archive.visionneuse || "#";
+        lien.title = "Agrandir la planche " + (index + 1);
+        const image = document.createElement("img");
         image.src = miniatureWebP;
-        image.onerror = () => {
-          image.onerror = null;
-          image.src = chemin;
-        };
-        
         image.alt = `Aperçu ${index + 1} de l'archive ${numero}`;
-        image.loading = "lazy";
-      });
-      
-      apercus.hidden = imagesApercu.length === 0;
+        image.loading = "eager";
+        image.decoding = "async";
+
+        const element = { lien, image, hauteResolution: secoursApercu[index] || "" };
+        liensApercu.push(element);
+
+        image.onerror = () => {
+          if (element.hauteResolution) {
+            image.onerror = null;
+            image.src = element.hauteResolution.replace(/sz=w\d+/, "sz=w600");
+          } else {
+            lien.hidden = true;
+          }
+        };
+
+        lien.addEventListener("click", (evenement) => {
+          if (!element.hauteResolution) return; // La visionneuse reste accessible
+          evenement.preventDefault();
+          ouvrirImageZoomable(
+            element.hauteResolution.replace(/sz=w\d+/, "sz=w1600"),
+            image.alt
+          );
+        });
+
+        lien.appendChild(image);
+        apercus.appendChild(lien);
+      }
+      apercus.hidden = false;
+
+      // La requête Drive ne retarde plus l'affichage des WebP.
+      async function chargerApercusDrive() {
+        if (!dossierPublication) return;
+        try {
+          const params = new URLSearchParams({
+            q: `'${dossierPublication}' in parents and trashed = false and mimeType = 'image/png'`,
+            fields: "nextPageToken,files(id,name)",
+            pageSize: "100",
+            key: CLE_API
+          });
+          const fichiers = [];
+          let pageToken = "";
+          do {
+            if (pageToken) params.set("pageToken", pageToken);
+            const reponseDrive = await fetch(
+              "https://www.googleapis.com/drive/v3/files?" + params
+            );
+            if (!reponseDrive.ok) throw new Error("Erreur Google Drive");
+            const donnees = await reponseDrive.json();
+            fichiers.push(...(donnees.files || []));
+            pageToken = donnees.nextPageToken || "";
+          } while (pageToken);
+
+          const planches = fichiers
+            .filter(f => /^\d+\.png$/i.test(f.name) && !/^00\.png$/i.test(f.name))
+            .sort((a, b) => a.name.localeCompare(b.name, "fr", { numeric: true }))
+            .slice(0, 3);
+
+          planches.forEach((f, index) => {
+            const element = liensApercu[index];
+            if (!element) return;
+            element.hauteResolution =
+              `https://drive.google.com/thumbnail?id=${encodeURIComponent(f.id)}&sz=w1600`;
+            if (element.lien.hidden) {
+              element.image.src = element.hauteResolution.replace(/sz=w\d+/, "sz=w600");
+              element.lien.hidden = false;
+            }
+          });
+        } catch (erreur) {
+          console.warn("Aperçus Drive indisponibles :", erreur);
+        }
+      }
+      chargerApercusDrive();
 
       // LIEN VERS LA VISIONNEUSE
       const visionneuse =
