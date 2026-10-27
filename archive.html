@@ -588,7 +588,7 @@ try {
         lien.title = "Agrandir la synthèse";
     
         const image = document.createElement("img");
-        image.src = archive.synthese;
+        image.src = archive.synthese.replace(/sz=w\d+/, "sz=w800");
         image.alt = `Infographie de synthèse de l'archive ${numero}`;
         image.className = "synthese-image";
         image.loading = "lazy";
