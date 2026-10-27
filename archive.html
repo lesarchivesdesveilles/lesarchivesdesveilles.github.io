@@ -517,24 +517,46 @@ try {
       if (archive.synthese) {
         const lien = document.createElement("a");
         lien.href = archive.synthese;
-        lien.target = "_blank";
-        lien.rel = "noopener noreferrer";
         lien.className = "synthese-lien";
-
+        lien.title = "Agrandir la synthèse";
+    
         const image = document.createElement("img");
         image.src = archive.synthese;
-        image.alt =
-          `Infographie de synthèse de l'archive ${numero}`;
+        image.alt = `Infographie de synthèse de l'archive ${numero}`;
         image.className = "synthese-image";
         image.loading = "lazy";
+    
+        lien.addEventListener("click", (evenement) => {
+          evenement.preventDefault();
 
-        lien.appendChild(image);
+        const fond = document.createElement("div");
+        fond.className = "agrandissement";
+  
+        const grandeImage = document.createElement("img");
+        grandeImage.src = archive.synthese.replace(/sz=w\d+/, "sz=w1600");
+        grandeImage.alt = image.alt;
+  
+        const fermer = document.createElement("button");
+        fermer.className = "fermer-agrandissement";
+        fermer.textContent = "×";
+        fermer.setAttribute("aria-label", "Fermer l'image");
+  
+        const fermerFenetre = () => fond.remove();
+  
+        fermer.addEventListener("click", fermerFenetre);
+        fond.addEventListener("click", (e) => {
+          if (e.target === fond) fermerFenetre();
+        });
 
-        document.getElementById("synthese")
-          .appendChild(lien);
-
-        document.getElementById("bloc-synthese").hidden = false;
-      }
+        fond.append(grandeImage, fermer);
+        document.body.appendChild(fond);
+      });
+  
+      lien.appendChild(image);
+  
+      document.getElementById("synthese").appendChild(lien);
+      document.getElementById("bloc-synthese").hidden = false;
+    }
 
     } catch (erreur) {
       console.error(erreur);
