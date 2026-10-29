@@ -495,7 +495,7 @@
           } while (pageToken);
 
           const planches = fichiers
-            .filter(f => /^\d+\.png$/i.test(f.name) && !/^00\.png$/i.test(f.name))
+            .filter(f => /^\d+\.(png|webp)$/i.test(f.name) && !/^00\.(png|webp)$/i.test(f.name))
             .sort((a, b) => a.name.localeCompare(b.name, "fr", { numeric: true }))
             .slice(0, 3);
 
