@@ -583,7 +583,7 @@
       if (dossierPublication) {
         try {
           const paramsFinale = new URLSearchParams({
-            q: `'${dossierPublication}' in parents and trashed = false and name = 'Finale.png'`,
+            q: `'${dossierPublication}' in parents and trashed = false and (name = 'Finale.png' or name = 'Finale.webp')`,
             fields: "files(id,name)",
             pageSize: "10",
             key: CLE_API
