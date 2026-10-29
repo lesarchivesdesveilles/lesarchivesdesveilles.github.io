@@ -476,7 +476,7 @@
         if (!dossierPublication) return;
         try {
           const params = new URLSearchParams({
-            q: `'${dossierPublication}' in parents and trashed = false and (mimeType = 'image/png' or mimeType = 'image/webp')',
+            q: `'${dossierPublication}' in parents and trashed = false and (mimeType = 'image/png' or mimeType = 'image/webp')`,
             fields: "nextPageToken,files(id,name)",
             pageSize: "100",
             key: CLE_API
