@@ -218,6 +218,41 @@
         font-size: 23px;
         margin-top: 5px;
       }
+
+      .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 35px;
+      }
+      
+      .pagination button {
+        background: transparent;
+        color: var(--discret);
+        border: 1px solid #70533e;
+        border-radius: 6px;
+        padding: 8px 13px;
+        font-size: 13px;
+        cursor: pointer;
+        transition: color .2s, border-color .2s;
+      }
+      
+      .pagination button:hover:not(:disabled) {
+        color: var(--or);
+        border-color: var(--or);
+      }
+      
+      .pagination button.actif {
+        color: var(--or);
+        border-color: var(--or);
+      }
+      
+      .pagination button:disabled {
+        opacity: .35;
+        cursor: default;
+      }
     }
     
   </style>
@@ -252,8 +287,11 @@
       aria-label="Rechercher une archive"
     >
 
-    <section class="galerie" id="galerie">
-    </section>
+   <section class="galerie" id="galerie"></section>
+
+  <nav class="pagination" id="pagination"
+       aria-label="Navigation entre les pages d'archives">
+  </nav>
     
   </main>
 
@@ -270,8 +308,12 @@
   <script>   
   const recherche = document.getElementById("recherche");
   const galerie = document.getElementById("galerie");
+  const pagination = document.getElementById("pagination");
   
-  let cartes = [];
+  const PAR_PAGE = 24;
+  
+  let archivesDisponibles = [];
+  let pageActuelle = 1;
   
   async function chargerArchives() {
     try {
@@ -283,55 +325,10 @@
   
       const archives = await reponse.json();
   
-      // Archives les plus récentes en premier
-      const liste = Object.entries(archives)
+      archivesDisponibles = Object.entries(archives)
         .sort(([a], [b]) => Number(b) - Number(a));
   
-      galerie.replaceChildren();
-  
-      for (const [numero, archive] of liste) {
-        const lien = document.createElement("a");
-        lien.className = "archive";
-        lien.href =
-          `archive.html?archive=${encodeURIComponent(numero)}`;
-  
-        const couverture = document.createElement("div");
-        couverture.className = "couverture";
-  
-        const image = document.createElement("img");
-        image.src = archive.miniature ||
-          `miniatures/${numero}.webp`;
-        image.alt = `Couverture de l'archive ${numero}`;
-        image.loading = "lazy";
-        image.decoding = "async";
-  
-        couverture.appendChild(image);
-  
-        const contenu = document.createElement("div");
-        contenu.className = "contenu";
-  
-        const etiquette = document.createElement("span");
-        etiquette.className = "numero";
-        etiquette.textContent = `ARCHIVE n° ${numero}`;
-  
-        const titre = document.createElement("h3");
-        const titreComplet = [
-          archive.titre,
-          archive.sousTitre
-        ].filter(Boolean).join(" : ");
-        
-        titre.textContent = titreComplet || `Archive ${numero}`;
-  
-        contenu.append(etiquette, titre);
-        lien.append(couverture, contenu);
-        galerie.appendChild(lien);
-      }
-  
-      // Mémoriser les cartes générées
-      cartes = Array.from(galerie.querySelectorAll(".archive"));
-  
-      // Appliquer une recherche déjà saisie
-      filtrerArchives();
+      afficherPage();
   
     } catch (erreur) {
       console.error(erreur);
@@ -340,22 +337,136 @@
     }
   }
   
-  function filtrerArchives() {
+  function creerCarte(numero, archive) {
+    const lien = document.createElement("a");
+    lien.className = "archive";
+    lien.href =
+      `archive.html?archive=${encodeURIComponent(numero)}`;
+  
+    const couverture = document.createElement("div");
+    couverture.className = "couverture";
+  
+    const image = document.createElement("img");
+    image.src = archive.miniature ||
+      `miniatures/${numero}.webp`;
+    image.alt = `Couverture de l'archive ${numero}`;
+    image.loading = "lazy";
+    image.decoding = "async";
+  
+    couverture.appendChild(image);
+  
+    const contenu = document.createElement("div");
+    contenu.className = "contenu";
+  
+    const etiquette = document.createElement("span");
+    etiquette.className = "numero";
+    etiquette.textContent = `ARCHIVE n° ${numero}`;
+  
+    const titre = document.createElement("h3");
+    titre.textContent = [
+      archive.titre,
+      archive.sousTitre
+    ].filter(Boolean).join(" : ") || `Archive ${numero}`;
+  
+    contenu.append(etiquette, titre);
+    lien.append(couverture, contenu);
+  
+    return lien;
+  }
+  
+  function archivesFiltrees() {
     const texte = recherche.value
       .trim()
       .toLocaleLowerCase("fr");
   
-    cartes.forEach(carte => {
-      const correspond = carte.textContent
-        .toLocaleLowerCase("fr")
-        .includes(texte);
+    return archivesDisponibles.filter(([numero, archive]) => {
+      const contenu = [
+        numero,
+        archive.titre || "",
+        archive.sousTitre || ""
+      ].join(" ").toLocaleLowerCase("fr");
   
-      carte.hidden = !correspond;
+      return contenu.includes(texte);
     });
   }
   
-  recherche.addEventListener("input", filtrerArchives);
+  function afficherPage() {
+    const resultats = archivesFiltrees();
+    const nombrePages = Math.ceil(resultats.length / PAR_PAGE);
   
+    pageActuelle = Math.max(
+      1,
+      Math.min(pageActuelle, nombrePages || 1)
+    );
+  
+    const debut = (pageActuelle - 1) * PAR_PAGE;
+    const visibles = resultats.slice(debut, debut + PAR_PAGE);
+  
+    galerie.replaceChildren();
+  
+    if (visibles.length === 0) {
+      const message = document.createElement("p");
+      message.textContent = "Aucune archive trouvée.";
+      galerie.appendChild(message);
+    } else {
+      visibles.forEach(([numero, archive]) => {
+        galerie.appendChild(creerCarte(numero, archive));
+      });
+    }
+  
+    afficherPagination(nombrePages);
+  }
+  
+  function afficherPagination(nombrePages) {
+    pagination.replaceChildren();
+  
+    if (nombrePages <= 1) return;
+  
+    function ajouterBouton(texte, page, actif = false, desactive = false) {
+      const bouton = document.createElement("button");
+      bouton.type = "button";
+      bouton.textContent = texte;
+      bouton.disabled = desactive;
+  
+      if (actif) {
+        bouton.classList.add("actif");
+        bouton.setAttribute("aria-current", "page");
+      }
+  
+      bouton.addEventListener("click", () => {
+        pageActuelle = page;
+        afficherPage();
+  
+        document.getElementById("recherche")
+          .scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+  
+      pagination.appendChild(bouton);
+    }
+  
+    ajouterBouton("‹", pageActuelle - 1, false, pageActuelle === 1);
+  
+    for (let page = 1; page <= nombrePages; page++) {
+      ajouterBouton(
+        String(page),
+        page,
+        page === pageActuelle
+      );
+    }
+  
+    ajouterBouton(
+      "›",
+      pageActuelle + 1,
+      false,
+      pageActuelle === nombrePages
+    );
+  }
+  
+  recherche.addEventListener("input", () => {
+    pageActuelle = 1;
+    afficherPage();
+  });
+
   chargerArchives();
 
   </script>
