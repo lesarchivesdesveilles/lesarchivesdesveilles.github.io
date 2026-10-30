@@ -238,73 +238,8 @@
     >
 
     <section class="galerie" id="galerie">
-      
-      <a class="archive"
-         href="archive.html?archive=226">
-        <div class="couverture">
-          <img
-            src="miniatures/226.webp"
-            alt="Couverture de l'archive 226"
-            loading="lazy"
-            decoding="async"
-          >
-        </div>
-        <div class="contenu">
-          <span class="numero">ARCHIVE n° 226</span>
-          <h3>TITRE DE L'ARCHIVE 226</h3>
-        </div>
-      </a>
-      
-      <a class="archive"
-         href="archive.html?archive=211">
-        <div class="couverture">
-          <img
-            src="miniatures/211.webp"
-            alt="Couverture de l'archive 211"
-            loading="lazy"
-            decoding="async"
-          >
-        </div>
-        <div class="contenu">
-          <span class="numero">ARCHIVE n° 211</span>
-          <h3>L'IA : de Gutenberg à la Source</h3>
-        </div>
-      </a>
-
-      <a class="archive"
-        href="archive.html?archive=210">
-        <div class="couverture">
-          <img
-            src="miniatures/210.webp"
-            alt="Couverture de l'archive 210"
-            loading="lazy"
-            decoding="async"
-          >
-        </div>
-        <div class="contenu">
-          <span class="numero">ARCHIVE n° 210</span>
-          <h3>Les Georgia Guidestones : sous les pierres</h3>
-        </div>
-      </a>
-
-      
-        <a class="archive"
-             href="archive.html?archive=209">
-        <div class="couverture">
-          <img
-            src="miniatures/209.webp"
-            alt="Couverture de l'archive 209"
-            loading="lazy"
-            decoding="async"
-          >
-        </div>
-        <div class="contenu">
-          <span class="numero">ARCHIVE n° 209</span>
-          <h3>Le Livre d'Énoch : le secret des Veilleurs</h3>
-        </div>
-      </a>
-
     </section>
+    
   </main>
 
   <footer>
@@ -312,20 +247,93 @@
   </footer>
 
   <script>
-    const recherche = document.getElementById("recherche");
-    const cartes = document.querySelectorAll(".archive");
-
-    recherche.addEventListener("input", () => {
-      const texte = recherche.value.toLocaleLowerCase("fr");
-
-      cartes.forEach(carte => {
-        const correspond = carte.textContent
-          .toLocaleLowerCase("fr")
-          .includes(texte);
-
-        carte.hidden = !correspond;
-      });
+   
+  const recherche = document.getElementById("recherche");
+  const galerie = document.getElementById("galerie");
+  
+  let cartes = [];
+  
+  async function chargerArchives() {
+    try {
+      const reponse = await fetch("archives.json");
+  
+      if (!reponse.ok) {
+        throw new Error("Impossible de charger archives.json");
+      }
+  
+      const archives = await reponse.json();
+  
+      // Archives les plus récentes en premier
+      const liste = Object.entries(archives)
+        .sort(([a], [b]) => Number(b) - Number(a));
+  
+      galerie.replaceChildren();
+  
+      for (const [numero, archive] of liste) {
+        const lien = document.createElement("a");
+        lien.className = "archive";
+        lien.href =
+          `archive.html?archive=${encodeURIComponent(numero)}`;
+  
+        const couverture = document.createElement("div");
+        couverture.className = "couverture";
+  
+        const image = document.createElement("img");
+        image.src = archive.miniature ||
+          `miniatures/${numero}.webp`;
+        image.alt = `Couverture de l'archive ${numero}`;
+        image.loading = "lazy";
+        image.decoding = "async";
+  
+        couverture.appendChild(image);
+  
+        const contenu = document.createElement("div");
+        contenu.className = "contenu";
+  
+        const etiquette = document.createElement("span");
+        etiquette.className = "numero";
+        etiquette.textContent = `ARCHIVE n° ${numero}`;
+  
+        const titre = document.createElement("h3");
+        titre.textContent = archive.titre ||
+          `Archive ${numero}`;
+  
+        contenu.append(etiquette, titre);
+        lien.append(couverture, contenu);
+        galerie.appendChild(lien);
+      }
+  
+      // Mémoriser les cartes générées
+      cartes = Array.from(galerie.querySelectorAll(".archive"));
+  
+      // Appliquer une recherche déjà saisie
+      filtrerArchives();
+  
+    } catch (erreur) {
+      console.error(erreur);
+      galerie.textContent =
+        "Impossible de charger les archives pour le moment.";
+    }
+  }
+  
+  function filtrerArchives() {
+    const texte = recherche.value
+      .trim()
+      .toLocaleLowerCase("fr");
+  
+    cartes.forEach(carte => {
+      const correspond = carte.textContent
+        .toLocaleLowerCase("fr")
+        .includes(texte);
+  
+      carte.hidden = !correspond;
     });
+  }
+  
+  recherche.addEventListener("input", filtrerArchives);
+  
+  chargerArchives();
+
   </script>
 
 </body>
