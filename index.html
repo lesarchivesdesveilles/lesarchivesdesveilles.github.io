@@ -31,20 +31,9 @@
       line-height: 1.6;
     }
     
-    .liens-sociaux {
-      margin-top: 18px;
-      font-size: 12px;
-      color: var(--discret);
-    }
-    
-    .liens-sociaux div {
-      margin-top: 5px;
-    }
-    
     .liens-sociaux a {
-      color: #c5a582;
+      color: var(--discret);
       text-decoration: none;
-      transition: color .2s;
     }
     
     .liens-sociaux a:hover {
@@ -52,9 +41,8 @@
       text-decoration: underline;
     }
     
-    .liens-sociaux div span {
-      margin: 0 7px;
-      color: #70533e;
+    footer p {
+      margin-bottom: 0;
     }
     
     .bandeau-accueil {
@@ -250,20 +238,7 @@
       Infographies issues de séances d'hypnose,<br>
       illustrant les perceptions, récits et hypothèses explorés.
     </p>
-
-    <nav class="liens-sociaux" aria-label="Réseaux sociaux">
-      <span>Retrouvez les explorations sur</span>
-      <div>
-        <a href="https://www.facebook.com/lesarchivesdesveilles/">Facebook</a>
-        <span>·</span>
-        <a href="https://www.instagram.com/lesveillesdefio/">Instagram</a>
-        <span>·</span>
-        <a href="https://www.youtube.com/@LesArchivesdesVeilles">YouTube</a>
-        <span>·</span>
-        <a href="https://www.tiktok.com/@lesarchivesdesveilles">TikTok</a>
-      </div>
-    </nav>
-      
+  
   </header>
 
   <main>
@@ -283,10 +258,14 @@
   </main>
 
   <footer>
-    © 2026 Les Archives des Veilles
+    <nav class="liens-sociaux" aria-label="Réseaux sociaux">
+      <a href="https://www.facebook.com/lesarchivesdesveilles/">Facebook</a> ·
+      <a href="https://www.instagram.com/lesveillesdefio/">Instagram</a> ·
+      <a href="https://www.youtube.com/@LesArchivesdesVeilles">YouTube</a> ·
+      <a href="https://www.tiktok.com/@lesarchivesdesveilles">TikTok</a>
+    </nav>
+    <p>© 2026 Les Archives des Veilles</p>
   </footer>
-
-  <script>
    
   const recherche = document.getElementById("recherche");
   const galerie = document.getElementById("galerie");
