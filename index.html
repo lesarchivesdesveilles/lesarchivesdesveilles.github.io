@@ -295,8 +295,12 @@
         etiquette.textContent = `ARCHIVE n° ${numero}`;
   
         const titre = document.createElement("h3");
-        titre.textContent = archive.titre ||
-          `Archive ${numero}`;
+        const titreComplet = [
+          archive.titre,
+          archive.sousTitre
+        ].filter(Boolean).join(" : ");
+        
+        titre.textContent = titreComplet || `Archive ${numero}`;
   
         contenu.append(etiquette, titre);
         lien.append(couverture, contenu);
