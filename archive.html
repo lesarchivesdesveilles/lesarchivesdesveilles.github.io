@@ -177,7 +177,7 @@
       color: var(--discret);
     }
 
-    /* Centrer l'indication sous la synthèse */
+    /* Centrer l'indication sous la synthÃ¨se */
     #bloc-synthese .note {
       text-align: center;
     }
@@ -216,7 +216,7 @@
       .bloc { padding: 18px; }
       .apercus { gap: 7px; }
     
-      /* Rapprocher le numéro d'archive du lien de retour */
+      /* Rapprocher le numÃ©ro d'archive du lien de retour */
       .numero {
         margin-top: 5px;
       }
@@ -230,7 +230,7 @@
 
   <main class="page">
     <a class="retour" href="index.html">
-      ← Retour à la bibliothèque
+      â† Retour Ã  la bibliothÃ¨que
     </a>
 
     <div class="numero" id="numero"></div>
@@ -239,40 +239,40 @@
 
     <!-- LES INFOGRAPHIES D'ABORD -->
     <section class="bloc" id="bloc-infographies">
-      <h2>✦ Découvrir les infographies</h2>
+      <h2>âœ¦ DÃ©couvrir les infographies</h2>
 
       <div class="apercus" id="apercus" hidden></div>
 
       <div class="actions">
         <a class="bouton" id="visionneuse" href="#">
-          ✦ Explorer toutes les infographies
+          âœ¦ Explorer toutes les infographies
         </a>
       </div>
     </section>
 
-    <!-- LE RÉCIT -->
+    <!-- LE RÃ‰CIT -->
     <section class="bloc">
-      <h2>✦ Le récit de l'exploration</h2>
+      <h2>âœ¦ Le rÃ©cit de l'exploration</h2>
 
       <div id="resume-intro"></div>
 
       <details id="resume-details" hidden>
-        <summary>Lire le résumé complet</summary>
+        <summary>Lire le rÃ©sumÃ© complet</summary>
         <div id="resume-suite"></div>
       </details>
 
       <p class="note">
-        Les récits et hypothèses présentés reflètent
-        les perceptions subjectives de la séance.
-        Ils ne constituent pas des faits établis.
+        Les rÃ©cits et hypothÃ¨ses prÃ©sentÃ©s reflÃ¨tent
+        les perceptions subjectives de la sÃ©ance.
+        Ils ne constituent pas des faits Ã©tablis.
       </p>
 
       <div id="source"></div>
     </section>
 
-    <!-- LA SYNTHÈSE -->
+    <!-- LA SYNTHÃˆSE -->
     <section class="bloc" id="bloc-synthese" hidden>
-      <h2>✦ Infographie de synthèse</h2>
+      <h2>âœ¦ Infographie de synthÃ¨se</h2>
       <div id="synthese"></div>
       <p class="note">
         Cliquez sur l'image pour l'afficher en grand.
@@ -282,7 +282,7 @@
 
   <script type="module">
     
-    // Clé API Google Drive
+    // ClÃ© API Google Drive
     const CLE_API = "AIzaSyAOworlnq91zYdAVyTkLomMDPDJFlu_fDE";
 
     function ouvrirImageZoomable(source, description) {
@@ -298,7 +298,7 @@
   
     const fermer = document.createElement("button");
     fermer.className = "fermer-agrandissement";
-    fermer.textContent = "×";
+    fermer.textContent = "Ã—";
     fermer.setAttribute("aria-label", "Fermer l'image");
   
     let zoom = 1;
@@ -390,27 +390,40 @@
       const archives = await reponse.json();
       const archive = archives[numero];
 
-      // Configuration de la visionneuse
-      const configReponse = await fetch(
-        "https://lesarchivesdesveilles.fr/archives-des-veilles-visionneuse/archives.json"
-      );
-      
-      if (!configReponse.ok) {
-        throw new Error("Impossible de charger les dossiers Drive");
-      }
-      
-      const configVisionneuse = await configReponse.json();
-      const dossierPublication = configVisionneuse[numero]?.dossier;
-
       if (!archive) {
         throw new Error("Archive introuvable : " + numero);
       }
 
+      // Les archives sans champ "format" restent des archives Ã  planches.
+      const syntheseSeule = archive.format === "synthese";
+      let dossierPublication = "";
+
+      // La configuration Drive reste facultative pour une synthÃ¨se autonome.
+      try {
+        const configReponse = await fetch(
+          "https://lesarchivesdesveilles.fr/archives-des-veilles-visionneuse/archives.json"
+        );
+        if (!configReponse.ok) throw new Error("Configuration Drive indisponible");
+        const configVisionneuse = await configReponse.json();
+        dossierPublication = configVisionneuse[numero]?.dossier || "";
+      } catch (erreur) {
+        console.warn("Configuration Drive indisponible :", erreur);
+      }
+
+      if (syntheseSeule) {
+        // Mettre l'unique image en premier, avant le rÃ©cit.
+        const blocSynthese = document.getElementById("bloc-synthese");
+        const blocInfographies = document.getElementById("bloc-infographies");
+        blocInfographies.hidden = true;
+        blocSynthese.querySelector("h2").textContent = "âœ¦ L'infographie de synthÃ¨se";
+        blocInfographies.after(blocSynthese);
+      }
+
       document.title =
-        `Archive ${numero} — Les Archives des Veilles`;
+        `Archive ${numero} â€” Les Archives des Veilles`;
 
       document.getElementById("numero").textContent =
-        `ARCHIVE n° ${numero}`;
+        `ARCHIVE nÂ° ${numero}`;
 
       document.getElementById("titre").textContent =
         archive.titre || "";
@@ -423,7 +436,8 @@
           `linear-gradient(to bottom, transparent 55%, #171119 100%), url("${archive.bandeau}")`;
       }
 
-      // APERÇUS : WebP GitHub immédiatement, PNG Drive en arrière-plan
+      if (!syntheseSeule) {
+      // APERÃ‡US : WebP GitHub immÃ©diatement, PNG Drive en arriÃ¨re-plan
       const apercus = document.getElementById("apercus");
       const liensApercu = [];
       const secoursApercu = Array.isArray(archive.apercus)
@@ -440,7 +454,7 @@
         lien.title = "Agrandir la planche " + (index + 1);
         const image = document.createElement("img");
         image.src = miniatureWebP;
-        image.alt = `Aperçu ${index + 1} de l'archive ${numero}`;
+        image.alt = `AperÃ§u ${index + 1} de l'archive ${numero}`;
         image.loading = "eager";
         image.decoding = "async";
 
@@ -470,7 +484,7 @@
       }
       apercus.hidden = false;
 
-      // La requête Drive ne retarde plus l'affichage des WebP.
+      // La requÃªte Drive ne retarde plus l'affichage des WebP.
       async function chargerApercusDrive() {
         if (!dossierPublication) return;
         try {
@@ -509,7 +523,7 @@
             }
           });
         } catch (erreur) {
-          console.warn("Aperçus Drive indisponibles :", erreur);
+          console.warn("AperÃ§us Drive indisponibles :", erreur);
         }
       }
       chargerApercusDrive();
@@ -524,7 +538,9 @@
         document.getElementById("bloc-infographies").hidden = true;
       }
 
-      // RÉSUMÉ DÉPLIABLE
+      }
+
+      // RÃ‰SUMÃ‰ DÃ‰PLIABLE
       if (archive.resume) {
         const paragraphes = archive.resume
           .split(/\n\s*\n/)
@@ -556,7 +572,7 @@
         }
       }
 
-      // SOURCE ET VIDÉO
+      // SOURCE ET VIDÃ‰O
       if (archive.source || archive.video) {
         const p = document.createElement("p");
         p.className = "note";
@@ -565,7 +581,7 @@
         if (archive.video) {
           const lien = document.createElement("a");
           lien.href = archive.video;
-          lien.textContent = archive.source || "Voir la vidéo";
+          lien.textContent = archive.source || "Voir la vidÃ©o";
           lien.target = "_blank";
           lien.rel = "noopener noreferrer";
           lien.style.color = "var(--or)";
@@ -605,20 +621,20 @@
               `https://drive.google.com/thumbnail?id=${encodeURIComponent(finale.id)}&sz=w1600`;
           }
         } catch (erreur) {
-          console.warn("Synthèse indisponible :", erreur);
+          console.warn("SynthÃ¨se indisponible :", erreur);
         }
       }
 
-      // INFOGRAPHIE DE SYNTHÈSE
+      // INFOGRAPHIE DE SYNTHÃˆSE
       if (archive.synthese) {
         const lien = document.createElement("a");
         lien.href = archive.synthese;
         lien.className = "synthese-lien";
-        lien.title = "Agrandir la synthèse";
+        lien.title = "Agrandir la synthÃ¨se";
     
         const image = document.createElement("img");
         image.src = archive.synthese.replace(/sz=w\d+/, "sz=w800");
-        image.alt = `Infographie de synthèse de l'archive ${numero}`;
+        image.alt = `Infographie de synthÃ¨se de l'archive ${numero}`;
         image.className = "synthese-image";
         image.loading = "lazy";
     
@@ -643,7 +659,7 @@
         "Impossible de charger cette archive";
 
       document.getElementById("resume-intro").textContent =
-        "Vérifie que le fichier archives.json existe et contient cette archive.";
+        "VÃ©rifie que le fichier archives.json existe et contient cette archive.";
 
       document.getElementById("bloc-infographies").hidden = true;
     }
