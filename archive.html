@@ -4,7 +4,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Les Archives des Veilles</title>
+  <title>Explorations — Les Archives des Veilles</title>
+  <meta name="description" content="Découvrez les récits et infographies des Archives des Veilles, issus de séances d'hypnose et présentés comme des perceptions et hypothèses subjectives.">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Les Archives des Veilles">
+  <meta property="og:title" content="Explorations — Les Archives des Veilles">
+  <meta property="og:description" content="Récits et infographies documentaires issus d'explorations sous hypnose.">
+  <meta property="og:image" content="https://lesarchivesdesveilles.fr/partage.webp">
 
   <style>
     :root {
@@ -419,8 +425,44 @@
         blocInfographies.after(blocSynthese);
       }
 
-      document.title =
-        `Archive ${numero} — Les Archives des Veilles`;
+      // Métadonnées propres à chaque archive (mises à jour côté navigateur).
+      const titreArchive = [archive.titre, archive.sousTitre]
+        .filter(Boolean).join(" — ") || `Archive ${numero}`;
+      const titreSEO = `${titreArchive} | Les Archives des Veilles`;
+      const descriptionSEO = (archive.resume ||
+        "Découvrez cette exploration et ses infographies dans Les Archives des Veilles.")
+        .replace(/\s+/g, " ").trim().slice(0, 160);
+      const urlCanonique = new URL("archive.html", window.location.href);
+      urlCanonique.search = new URLSearchParams({ archive: numero }).toString();
+      urlCanonique.hash = "";
+
+      function definirMeta(attribut, cle, valeur) {
+        let meta = document.querySelector(`meta[${attribut}="${cle}"]`);
+        if (!meta) {
+          meta = document.createElement("meta");
+          meta.setAttribute(attribut, cle);
+          document.head.appendChild(meta);
+        }
+        meta.content = valeur;
+      }
+
+      document.title = titreSEO;
+      definirMeta("name", "description", descriptionSEO);
+      definirMeta("property", "og:title", titreSEO);
+      definirMeta("property", "og:description", descriptionSEO);
+      definirMeta("property", "og:url", urlCanonique.href);
+      definirMeta("property", "og:image", new URL(
+        archive.miniature || `miniatures/${numero}.webp`,
+        window.location.href
+      ).href);
+
+      let canonique = document.querySelector('link[rel="canonical"]');
+      if (!canonique) {
+        canonique = document.createElement("link");
+        canonique.rel = "canonical";
+        document.head.appendChild(canonique);
+      }
+      canonique.href = urlCanonique.href;
 
       document.getElementById("numero").textContent =
         `ARCHIVE n° ${numero}`;
