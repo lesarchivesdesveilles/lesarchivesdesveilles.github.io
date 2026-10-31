@@ -283,7 +283,7 @@
       class="recherche"
       id="recherche"
       type="search"
-      placeholder="Rechercher un titre ou un numéro d'archive…"
+      placeholder="Rechercher un titre, un numéro ou une source…"
       aria-label="Rechercher une archive"
     >
 
@@ -383,7 +383,8 @@
       const contenu = [
         numero,
         archive.titre || "",
-        archive.sousTitre || ""
+        archive.sousTitre || "",
+        archive.source || ""
       ].join(" ").toLocaleLowerCase("fr");
   
       return contenu.includes(texte);
