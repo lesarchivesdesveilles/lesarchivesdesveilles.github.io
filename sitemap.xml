@@ -1,7 +1,28 @@
+
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://lesarchivesdesveilles.fr/</loc></url>
-  <url><loc>https://lesarchivesdesveilles.fr/archive.html?archive=225</loc></url>
-  <url><loc>https://lesarchivesdesveilles.fr/archive.html?archive=226</loc></url>
-  <url><loc>https://lesarchivesdesveilles.fr/archive.html?archive=227</loc></url>
+  <url>
+    <loc>https://lesarchivesdesveilles.fr/</loc>
+  </url>
+  <url>
+    <loc>https://lesarchivesdesveilles.fr/archive.html?archive=227</loc>
+  </url>
+  <url>
+    <loc>https://lesarchivesdesveilles.fr/archive.html?archive=226</loc>
+  </url>
+  <url>
+    <loc>https://lesarchivesdesveilles.fr/archive.html?archive=225</loc>
+  </url>
+  <url>
+    <loc>https://lesarchivesdesveilles.fr/archive.html?archive=224</loc>
+  </url>
+  <url>
+    <loc>https://lesarchivesdesveilles.fr/archive.html?archive=211</loc>
+  </url>
+  <url>
+    <loc>https://lesarchivesdesveilles.fr/archive.html?archive=210</loc>
+  </url>
+  <url>
+    <loc>https://lesarchivesdesveilles.fr/archive.html?archive=209</loc>
+  </url>
 </urlset>
