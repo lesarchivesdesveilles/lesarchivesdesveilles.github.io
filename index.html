@@ -365,10 +365,16 @@
     etiquette.textContent = `ARCHIVE n° ${numero}`;
   
     const titre = document.createElement("h3");
-    titre.textContent = [
-      archive.titre,
-      archive.sousTitre
-    ].filter(Boolean).join(" : ") || `Archive ${numero}`;
+    const titrePrincipal = archive.titre || "";
+    const sousTitre = archive.sousTitre || "";
+    
+    const sousTitreCarte = sousTitre
+      ? sousTitre.charAt(0).toLocaleLowerCase("fr") + sousTitre.slice(1)
+      : "";
+    
+    titre.textContent = [titrePrincipal, sousTitreCarte]
+      .filter(Boolean)
+      .join(" : ") || `Archive ${numero}`;
   
     contenu.append(etiquette, titre);
     lien.append(couverture, contenu);
