@@ -357,6 +357,33 @@
       glissement = false;
       actualiser();
     });
+
+    let aGlisse = false;
+
+    image.addEventListener("pointerdown", () => {
+      aGlisse = false;
+    });
+    
+    image.addEventListener("pointermove", (e) => {
+      if (glissement) {
+        aGlisse = true;
+      }
+    });
+    
+    image.addEventListener("click", (e) => {
+      if (e.detail === 0 || aGlisse) return;
+    
+      // Un clic zoome, le suivant dézoome.
+      if (zoom === 1) {
+        zoom = 2;
+      } else {
+        zoom = 1;
+        x = 0;
+        y = 0;
+      }
+    
+      actualiser();
+    });
       
     fermer.addEventListener("click", () => fond.remove());
   
