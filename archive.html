@@ -369,11 +369,37 @@
         aGlisse = true;
       }
     });
+ 
+    let aGlisse = false;
+    let debutX = 0;
+    let debutY = 0;
+    
+    image.addEventListener("pointerdown", (e) => {
+      if (e.pointerType !== "mouse") return;
+    
+      aGlisse = false;
+      debutX = e.clientX;
+      debutY = e.clientY;
+    });
+    
+    image.addEventListener("pointermove", (e) => {
+      if (e.pointerType !== "mouse") return;
+    
+      if (
+        Math.abs(e.clientX - debutX) > 5 ||
+        Math.abs(e.clientY - debutY) > 5
+      ) {
+        aGlisse = true;
+      }
+    });
     
     image.addEventListener("click", (e) => {
+      // Aucun zoom au clic sur mobile ou tablette tactile
       if (e.detail === 0 || aGlisse) return;
     
-      // Un clic zoome, le suivant dézoome.
+      // Uniquement les clics provenant d'une souris
+      if (!dernierClicSouris) return;
+    
       if (zoom === 1) {
         zoom = 2;
       } else {
@@ -381,6 +407,19 @@
         x = 0;
         y = 0;
       }
+    
+      actualiser();
+    });
+    
+    let dernierClicSouris = false;
+    
+    image.addEventListener("pointerup", (e) => {
+      dernierClicSouris = e.pointerType === "mouse";
+    });
+    
+    image.addEventListener("pointercancel", () => {
+      dernierClicSouris = false;
+    });
     
       actualiser();
     });
