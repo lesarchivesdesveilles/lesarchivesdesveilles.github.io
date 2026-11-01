@@ -357,21 +357,7 @@
       glissement = false;
       actualiser();
     });
-  
-    image.addEventListener("click", () => {
-      if (glissement) return;
-    
-      if (zoom === 1) {
-        zoom = 2;
-      } else {
-        zoom = 1;
-        x = 0;
-        y = 0;
-      }
-
-  actualiser();
-});
-  
+      
     fermer.addEventListener("click", () => fond.remove());
   
     fond.addEventListener("click", (e) => {
