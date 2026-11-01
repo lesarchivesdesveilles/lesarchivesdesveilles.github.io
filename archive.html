@@ -357,33 +357,23 @@
       glissement = false;
       actualiser();
     });
-
-    let aGlisse = false;
-
-    image.addEventListener("pointerdown", () => {
-      aGlisse = false;
-    });
-    
-    image.addEventListener("pointermove", (e) => {
-      if (glissement) {
-        aGlisse = true;
-      }
-    });
- 
+   
     let aGlisse = false;
     let debutX = 0;
     let debutY = 0;
+    let dernierClicSouris = false;
     
     image.addEventListener("pointerdown", (e) => {
       if (e.pointerType !== "mouse") return;
     
+      dernierClicSouris = false;
       aGlisse = false;
       debutX = e.clientX;
       debutY = e.clientY;
     });
     
     image.addEventListener("pointermove", (e) => {
-      if (e.pointerType !== "mouse") return;
+      if (e.pointerType !== "mouse" || e.buttons === 0) return;
     
       if (
         Math.abs(e.clientX - debutX) > 5 ||
@@ -393,12 +383,13 @@
       }
     });
     
-    image.addEventListener("click", (e) => {
-      // Aucun zoom au clic sur mobile ou tablette tactile
-      if (e.detail === 0 || aGlisse) return;
+    image.addEventListener("pointerup", (e) => {
+      dernierClicSouris = e.pointerType === "mouse";
+    });
     
-      // Uniquement les clics provenant d'une souris
-      if (!dernierClicSouris) return;
+    image.addEventListener("click", (e) => {
+      // Ignorer les clics tactiles et les déplacements.
+      if (!dernierClicSouris || aGlisse) return;
     
       if (zoom === 1) {
         zoom = 2;
@@ -410,20 +401,7 @@
     
       actualiser();
     });
-    
-    let dernierClicSouris = false;
-    
-    image.addEventListener("pointerup", (e) => {
-      dernierClicSouris = e.pointerType === "mouse";
-    });
-    
-    image.addEventListener("pointercancel", () => {
-      dernierClicSouris = false;
-    });
-    
-      actualiser();
-    });
-      
+
     fermer.addEventListener("click", () => fond.remove());
   
     fond.addEventListener("click", (e) => {
