@@ -461,8 +461,11 @@
   function creerCarte(numero, archive) {
     const lien = document.createElement("a");
     lien.className = "archive";
+      
+    const retour = window.location.pathname + window.location.search;
+    
     lien.href =
-      `archive.html?archive=${encodeURIComponent(numero)}`;
+      `archive.html?archive=${encodeURIComponent(numero)}&retour=${encodeURIComponent(retour)}`;
   
     const couverture = document.createElement("div");
     couverture.className = "couverture";
