@@ -222,11 +222,59 @@
       .bloc { padding: 18px; }
       .apercus { gap: 7px; }
     
-      /* Rapprocher le numéro d'archive du lien de retour */
+    /* Rapprocher le numéro d'archive du lien de retour */
       .numero {
         margin-top: 5px;
       }
     }
+
+    
+    /* Pied de page — retour à la bibliothèque */
+    .pied-archive {
+      text-align: center;
+      padding: 10px 20px 55px;
+      border-top: 1px solid #70533e;
+    }
+    
+    .pied-archive a {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      color: var(--or);
+      text-decoration: none;
+      font-family: Georgia, serif;
+      font-size: 15px;
+    }
+    
+    .pied-archive img {
+      display: block;
+      width: 110px;
+      height: auto;
+      transition: transform .25s, filter .25s;
+    }
+    
+    .pied-archive a:hover img {
+      transform: scale(1.08);
+      filter: drop-shadow(0 0 12px rgba(232,187,126,.45));
+    }
+    
+    .pied-archive a:hover span {
+      text-decoration: underline;
+    }
+    
+    .pied-archive a:focus-visible {
+      outline: 2px solid var(--or);
+      outline-offset: 8px;
+      border-radius: 6px;
+    }
+    
+    @media (prefers-reduced-motion: reduce) {
+      .pied-archive img {
+        transition: none;
+      }
+    }
+
   </style>
 </head>
 
@@ -285,6 +333,17 @@
       </p>
     </section>
   </main>
+
+
+  <footer class="pied-archive">
+    <a href="index.html" id="retour-oeil"
+       aria-label="Retour à la bibliothèque">
+      <img src="images/oeil-ouvert.webp"
+           alt=""
+           width="110">
+      <span>Retour à la Bibliothèque</span>
+    </a>
+  </footer>
 
   <script type="module">
     
