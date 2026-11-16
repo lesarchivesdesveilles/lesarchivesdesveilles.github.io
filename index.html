@@ -281,7 +281,53 @@
       }
     }
 
-  
+    
+    /* Pagination — correction ordinateur et mobile */
+    nav.pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      width: 100%;
+      margin: 35px auto 0;
+    }
+    
+    nav.pagination button {
+      appearance: none;
+      min-width: 42px;
+      min-height: 42px;
+      padding: 9px 12px;
+      background: #30222e;
+      color: #f5e5cb;
+      border: 1px solid #70533e;
+      border-radius: 8px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+    
+    nav.pagination button:hover:not(:disabled) {
+      background: #463044;
+      border-color: #e8bb7e;
+    }
+    
+    nav.pagination button.actif {
+      background: #e8bb7e;
+      color: #171119;
+      border-color: #e8bb7e;
+      font-weight: bold;
+    }
+    
+    nav.pagination button:disabled {
+      opacity: .35;
+      cursor: default;
+    }
+    
+    nav.pagination .points {
+      padding: 0 4px;
+      color: #b59b86;
+    }
+
     
   </style>
 </head>
