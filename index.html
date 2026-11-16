@@ -222,41 +222,66 @@
         margin-top: 5px;
       }
 
+      
+      /* Pagination — ordinateur et mobile */
       .pagination {
         display: flex;
         justify-content: center;
         align-items: center;
         flex-wrap: wrap;
-        gap: 10px;
+        gap: 8px;
         margin-top: 35px;
       }
       
       .pagination button {
-        background: transparent;
-        color: var(--discret);
+        min-width: 42px;
+        min-height: 42px;
+        padding: 9px 12px;
+        background: #30222e;
+        color: var(--texte);
         border: 1px solid #70533e;
-        border-radius: 6px;
-        padding: 8px 13px;
-        font-size: 13px;
+        border-radius: 8px;
+        font-size: 15px;
         cursor: pointer;
-        transition: color .2s, border-color .2s;
+        transition: background .2s, border-color .2s;
       }
       
       .pagination button:hover:not(:disabled) {
-        color: var(--or);
+        background: #463044;
         border-color: var(--or);
       }
       
       .pagination button.actif {
-        color: var(--or);
+        background: var(--or);
+        color: var(--fond);
         border-color: var(--or);
+        font-weight: bold;
       }
       
       .pagination button:disabled {
         opacity: .35;
         cursor: default;
       }
+      
+      .pagination .points {
+        padding: 0 4px;
+        color: var(--discret);
+      }
+      
+      @media (max-width: 600px) {
+        .pagination {
+          gap: 5px;
+        }
+      
+        .pagination button {
+          min-width: 38px;
+          min-height: 42px;
+          padding: 8px;
+        }
+      }
     }
+
+  
     
   </style>
 </head>
@@ -317,6 +342,53 @@
   
   let archivesDisponibles = [];
   let pageActuelle = 1;
+  
+  const parametresInitiaux = new URLSearchParams(window.location.search);
+  
+  pageActuelle = Math.max(
+    1,
+    parseInt(parametresInitiaux.get("page"), 10) || 1
+  );
+  
+  recherche.value = parametresInitiaux.get("recherche") || "";
+  
+  function synchroniserURL(ajouterHistorique = false) {
+    const url = new URL(window.location.href);
+  
+    if (pageActuelle > 1) {
+      url.searchParams.set("page", pageActuelle);
+    } else {
+      url.searchParams.delete("page");
+    }
+  
+    if (recherche.value.trim()) {
+      url.searchParams.set("recherche", recherche.value.trim());
+    } else {
+      url.searchParams.delete("recherche");
+    }
+  
+    history[ajouterHistorique ? "pushState" : "replaceState"](
+      null, "", url
+    );
+  }
+  
+  function changerPage(page) {
+    pageActuelle = page;
+    afficherPage();
+    synchroniserURL(true);
+  
+    recherche.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+  }
+  
+  window.addEventListener("popstate", () => {
+    const params = new URLSearchParams(window.location.search);
+    pageActuelle = Math.max(1, parseInt(params.get("page"), 10) || 1);
+    recherche.value = params.get("recherche") || "";
+    afficherPage();
+  });
   
   async function chargerArchives() {
     try {
@@ -427,54 +499,78 @@
     afficherPagination(nombrePages);
   }
   
-  function afficherPagination(nombrePages) {
-    pagination.replaceChildren();
   
-    if (nombrePages <= 1) return;
+function afficherPagination(nombrePages) {
+  pagination.replaceChildren();
+
+  if (nombrePages <= 1) return;
+
+  function ajouterBouton(texte, page, actif = false, desactive = false, description = "") {
+    const bouton = document.createElement("button");
+    bouton.type = "button";
+    bouton.textContent = texte;
+    bouton.disabled = desactive;
+
+    if (description) {
+      bouton.setAttribute("aria-label", description);
+      bouton.title = description;
+    }
+
+    if (actif) {
+      bouton.classList.add("actif");
+      bouton.setAttribute("aria-current", "page");
+    }
+
+    bouton.addEventListener("click", () => {
+      changerPage(page);
+    });
+
+    pagination.appendChild(bouton);
+  }
+
+  function ajouterPoints() {
+    const points = document.createElement("span");
+    points.className = "points";
+    points.textContent = "…";
+    points.setAttribute("aria-hidden", "true");
+    pagination.appendChild(points);
+  }
+
+  ajouterBouton("«", 1, false, pageActuelle === 1, "Première page");
+  ajouterBouton("‹", pageActuelle - 1, false, pageActuelle === 1, "Page précédente");
+
+    // Première, dernière et pages proches de la page actuelle
+    const pages = new Set([1, nombrePages]);
   
-    function ajouterBouton(texte, page, actif = false, desactive = false) {
-      const bouton = document.createElement("button");
-      bouton.type = "button";
-      bouton.textContent = texte;
-      bouton.disabled = desactive;
+    for (let p = pageActuelle - 1; p <= pageActuelle + 1; p++) {
+      if (p >= 1 && p <= nombrePages) pages.add(p);
+    }
   
-      if (actif) {
-        bouton.classList.add("actif");
-        bouton.setAttribute("aria-current", "page");
+    const pagesTriees = [...pages].sort((a, b) => a - b);
+    let precedente = 0;
+  
+    for (const page of pagesTriees) {
+      if (precedente && page - precedente === 2) {
+        ajouterBouton(String(precedente + 1), precedente + 1);
+      } else if (precedente && page - precedente > 2) {
+        ajouterPoints();
       }
   
-      bouton.addEventListener("click", () => {
-        pageActuelle = page;
-        afficherPage();
-  
-        document.getElementById("recherche")
-          .scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-  
-      pagination.appendChild(bouton);
+      ajouterBouton(String(page), page, page === pageActuelle);
+      precedente = page;
     }
   
-    ajouterBouton("‹", pageActuelle - 1, false, pageActuelle === 1);
+    ajouterBouton("›", pageActuelle + 1, false,
+      pageActuelle === nombrePages, "Page suivante");
   
-    for (let page = 1; page <= nombrePages; page++) {
-      ajouterBouton(
-        String(page),
-        page,
-        page === pageActuelle
-      );
-    }
-  
-    ajouterBouton(
-      "›",
-      pageActuelle + 1,
-      false,
-      pageActuelle === nombrePages
-    );
+    ajouterBouton("»", nombrePages, false,
+      pageActuelle === nombrePages, "Dernière page");
   }
-  
+
   recherche.addEventListener("input", () => {
     pageActuelle = 1;
     afficherPage();
+    synchroniserURL();
   });
 
   chargerArchives();
