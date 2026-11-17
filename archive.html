@@ -577,7 +577,7 @@
         }
       
         element.href = url.pathname + url.search;
-        element.textContent = `${texte} — n° ${numeroCible}`;
+        element.textContent = texte;
         element.hidden = false;
       }
       
@@ -585,13 +585,13 @@
         preparerLien(
           lienPrecedent,
           numeros[position - 1],
-          "‹ Archive précédente"
+          "‹\u00A0\u00A0Archive précédente"
         );
       
         preparerLien(
           lienSuivant,
           numeros[position + 1],
-          "Archive suivante ›"
+          "Archive suivante\u00A0\u00A0›"
         );
       
         navigation.hidden = false;
