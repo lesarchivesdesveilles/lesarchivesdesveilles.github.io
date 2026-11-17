@@ -80,7 +80,14 @@
       margin: 10px 0;
     }
 
-    .sous-titre { color: var(--discret); }
+    .sous-titre { 
+      min-height: 24px;
+      color: var(--discret)
+    }
+
+    .sous-titre:empty {
+      display: block;
+    }
 
     .bloc {
       background: var(--carte);
