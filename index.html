@@ -420,9 +420,9 @@
   
   function changerPage(page) {
     pageActuelle = page;
-    afficherPage();
     synchroniserURL(true);
-  
+    afficherPage();
+      
     recherche.scrollIntoView({
       behavior: "smooth",
       block: "start"
