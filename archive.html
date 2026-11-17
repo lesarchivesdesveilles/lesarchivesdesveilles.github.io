@@ -555,6 +555,52 @@
       }
 
       const archives = await reponse.json();
+      
+      const navigation = document.getElementById("navigation-archives");
+      const lienPrecedent = document.getElementById("archive-precedente");
+      const lienSuivant = document.getElementById("archive-suivante");
+      
+      const numeros = Object.keys(archives)
+        .map(Number)
+        .filter(Number.isFinite)
+        .sort((a, b) => a - b);
+      
+      const position = numeros.indexOf(Number(numero));
+      
+      function preparerLien(element, numeroCible, texte) {
+        if (numeroCible === undefined) {
+          element.hidden = true;
+          return;
+        }
+      
+        const url = new URL("archive.html", window.location.href);
+        url.searchParams.set("archive", numeroCible);
+      
+        if (retourDemande) {
+          url.searchParams.set("retour", retourDemande);
+        }
+      
+        element.href = url.pathname + url.search;
+        element.textContent = `${texte} — n° ${numeroCible}`;
+        element.hidden = false;
+      }
+      
+      if (position !== -1) {
+        preparerLien(
+          lienPrecedent,
+          numeros[position - 1],
+          "‹ Archive précédente"
+        );
+      
+        preparerLien(
+          lienSuivant,
+          numeros[position + 1],
+          "Archive suivante ›"
+        );
+      
+        navigation.hidden = false;
+      }
+
       const archive = archives[numero];
 
       if (!archive) {
