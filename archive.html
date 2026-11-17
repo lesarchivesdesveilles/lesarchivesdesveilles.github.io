@@ -473,7 +473,31 @@
     const numero =
       new URLSearchParams(window.location.search)
         .get("archive") || "209";
-
+    
+    const paramsRetour = new URLSearchParams(window.location.search);
+    const retourDemande = paramsRetour.get("retour");
+    
+    let destinationRetour = "index.html";
+    
+    if (retourDemande) {
+      try {
+        const urlRetour = new URL(retourDemande, window.location.origin);
+    
+        if (
+          urlRetour.origin === window.location.origin &&
+          (urlRetour.pathname === "/" ||
+           urlRetour.pathname === "/index.html")
+        ) {
+          destinationRetour = urlRetour.pathname + urlRetour.search;
+        }
+      } catch (erreur) {
+        console.warn("Adresse de retour invalide :", erreur);
+      }
+    }
+    
+    document.querySelectorAll(".retour, #retour-oeil")
+        .forEach(lien => lien.href = destinationRetour);
+    
     try {
       const reponse = await fetch("archives.json");
 
