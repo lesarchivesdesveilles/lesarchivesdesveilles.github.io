@@ -121,16 +121,50 @@
       font-weight: normal;
     }
 
+    .zone-recherche {
+      position: relative;
+      margin: 8px 0 30px;
+    }
+
     .recherche {
       width: 100%;
       padding: 15px;
-      margin: 8px 0 30px;
+      padding-right: 52px;
+      margin: 0;
       background: #241a25;
       border: 1px solid #70533e;
       border-radius: 9px;
       color: var(--texte);
       font-size: 16px;
     }
+
+    /* Croix de suppression personnalisée, assortie au site */
+    .recherche::-webkit-search-cancel-button,
+    .recherche::-webkit-search-decoration {
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .effacer-recherche {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 40px;
+      height: 40px;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      color: var(--or);
+      font: 24px/1 Arial, sans-serif;
+      cursor: pointer;
+    }
+    .effacer-recherche:hover { background: #463044; }
+    .effacer-recherche:focus-visible {
+      outline: 2px solid var(--or);
+      outline-offset: 1px;
+    }
+    .effacer-recherche[hidden] { display: none; }
 
     .galerie {
       display: grid;
@@ -408,14 +442,6 @@
     }
     .retour-haut:focus-visible { outline: 2px solid var(--texte); outline-offset: 3px; }
     .erreur-chargement { grid-column: 1 / -1; }
-    .erreur-chargement a {
-      color: var(--or);
-      text-decoration: none;
-    }
-    
-    .erreur-chargement a:hover {
-      text-decoration: underline;
-    }
     .reessayer {
       display: inline-block;
       margin-top: 12px;
@@ -469,13 +495,17 @@
       </details>
     </div>
 
-    <input
-      class="recherche"
-      id="recherche"
-      type="search"
-      placeholder="Rechercher : titre, n° ou source…"
-      aria-label="Rechercher une archive"
-    >
+    <div class="zone-recherche">
+      <input
+        class="recherche"
+        id="recherche"
+        type="search"
+        placeholder="Rechercher : titre, n° ou source…"
+        aria-label="Rechercher une archive"
+      >
+      <button class="effacer-recherche" id="effacer-recherche" type="button"
+              aria-label="Effacer la recherche" title="Effacer la recherche" hidden>×</button>
+    </div>
 
    <section class="galerie" id="galerie"></section>
 
@@ -501,6 +531,15 @@
 
   <script>   
   const recherche = document.getElementById("recherche");
+  const effacerRecherche = document.getElementById("effacer-recherche");
+  function actualiserEffacement() {
+    effacerRecherche.hidden = recherche.value.length === 0;
+  }
+  effacerRecherche.addEventListener("click", () => {
+    recherche.value = "";
+    recherche.dispatchEvent(new Event("input", { bubbles: true }));
+    recherche.focus();
+  });
   const galerie = document.getElementById("galerie");
   const pagination = document.getElementById("pagination");
   
@@ -550,6 +589,7 @@
   );
   
   recherche.value = parametresInitiaux.get("recherche") || "";
+  actualiserEffacement();
   
   function synchroniserURL(ajouterHistorique = false) {
     const url = new URL(window.location.href);
@@ -586,6 +626,7 @@
     const params = new URLSearchParams(window.location.search);
     pageActuelle = Math.max(1, parseInt(params.get("page"), 10) || 1);
     recherche.value = params.get("recherche") || "";
+    actualiserEffacement();
     afficherPage();
   });
   
@@ -788,6 +829,7 @@ function afficherPagination(nombrePages) {
   }
 
   recherche.addEventListener("input", () => {
+    actualiserEffacement();
     pageActuelle = 1;
     afficherPage();
     synchroniserURL();
