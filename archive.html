@@ -620,10 +620,11 @@
     
     const paramsRetour = new URLSearchParams(window.location.search);
     const retourDemande = paramsRetour.get("retour");
+    const modeSurprise = paramsRetour.get("surprise") === "1";
     
     let destinationRetour = "index.html";
     
-    if (retourDemande) {
+    if (retourDemande && !modeSurprise) {
       try {
         const urlRetour = new URL(retourDemande, window.location.origin);
     
@@ -641,7 +642,7 @@
     }
     
     // Le lien du haut conserve la page de provenance
-    document.querySelector(".retour").href = destinationRetour;
+    document.querySelector(".retour").href = modeSurprise ? "index.html" : destinationRetour;
     
     // L'œil du bas revient toujours à l'accueil du site
     document.getElementById("retour-oeil").href = "/";
@@ -697,7 +698,7 @@
           "Archive suivante\u00A0\u00A0›"
         );
       
-        navigation.hidden = false;
+        navigation.hidden = modeSurprise;
       }
 
       const archive = archives[numero];
