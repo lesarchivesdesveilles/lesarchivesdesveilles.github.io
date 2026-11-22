@@ -100,12 +100,17 @@
       margin-top: 0;
     }
 
-   .apercus {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+    .apercus {
+      display: flex;
+      justify-content: center;
       gap: 10px;
       max-width: 520px;
       margin: 20px auto;
+    }
+  
+    .apercus a {
+      width: calc((100% - 20px) / 3);
+      flex-shrink: 0;
     }
     
     .apercus a {
@@ -157,8 +162,11 @@
     /* Garder trois colonnes sur mobile */
     @media (max-width: 600px) {
       .apercus {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 7px;
+      }
+    
+      .apercus a {
+        width: calc((100% - 14px) / 3);
       }
     }
 
