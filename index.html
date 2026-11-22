@@ -690,6 +690,18 @@ function afficherPagination(nombrePages) {
 
   chargerArchives();
 
+  // Fermer le menu hamburger au clic extérieur
+  const menuExploration = document.querySelector(".menu-exploration");
+  
+  document.addEventListener("click", (evenement) => {
+    if (
+      menuExploration.open &&
+      !menuExploration.contains(evenement.target)
+    ) {
+      menuExploration.open = false;
+    }
+  });
+
   </script>
 
 </body>
