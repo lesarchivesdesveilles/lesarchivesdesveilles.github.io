@@ -1,11 +1,13 @@
-name: Mettre a jour le sitemap
+name: Mettre a jour le sitemap et l index
 
 on:
   push:
     branches: [main]
     paths:
       - 'archives.json'
+      - 'thematiques.json'
       - 'scripts/generate_sitemap.py'
+      - 'scripts/generer_index.py'
       - '.github/workflows/update-sitemap.yml'
   workflow_dispatch:
 
@@ -22,14 +24,16 @@ jobs:
           persist-credentials: true
       - name: Generer sitemap.xml
         run: python3 scripts/generate_sitemap.py
-      - name: Publier si le sitemap a change
+      - name: Generer index-archives.json
+        run: python3 scripts/generer_index.py
+      - name: Publier les fichiers generes si necessaire
         run: |
-          if ! git diff --quiet -- sitemap.xml; then
+          git add sitemap.xml index-archives.json
+          if ! git diff --cached --quiet; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add sitemap.xml
-            git commit -m "Mise a jour automatique du sitemap"
+            git commit -m "Mise a jour automatique du sitemap et de l index"
             git push
           else
-            echo "Sitemap deja a jour"
+            echo "Sitemap et index deja a jour"
           fi
