@@ -676,8 +676,11 @@
         const url = new URL("archive.html", window.location.href);
         url.searchParams.set("archive", numeroCible);
       
-        if (retourDemande) {
+        if (retourDemande && !modeSurprise) {
           url.searchParams.set("retour", retourDemande);
+        }
+        if (modeSurprise) {
+          url.searchParams.set("surprise", "1");
         }
       
         element.href = url.pathname + url.search;
@@ -698,7 +701,7 @@
           "Archive suivante\u00A0\u00A0›"
         );
       
-        navigation.hidden = modeSurprise;
+        navigation.hidden = false;
       }
 
       const archive = archives[numero];
