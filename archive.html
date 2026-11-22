@@ -563,8 +563,11 @@
       }
     }
     
-    document.querySelectorAll(".retour, #retour-oeil")
-        .forEach(lien => lien.href = destinationRetour);
+    // Le lien du haut conserve la page de provenance
+    document.querySelector(".retour").href = destinationRetour;
+    
+    // L'œil du bas revient toujours à l'accueil du site
+    document.getElementById("retour-oeil").href = "/";
     
     try {
       const reponse = await fetch("archives.json");
