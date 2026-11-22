@@ -351,7 +351,22 @@
   </header>
 
   <main>
-    <h2>Explorer les archives</h2>
+    
+    <div class="entete-exploration">
+      <h2>Explorer les archives</h2>
+  
+      <details class="menu-exploration">
+        <summary aria-label="Ouvrir le menu de navigation"
+                 title="Navigation">☰</summary>
+  
+        <nav aria-label="Explorer la bibliothèque">
+          <a href="index.html">Bibliothèque</a>
+          <a href="explorer.html">Index des titres</a>
+          <a href="explorer.html?vue=themes">Par thématique</a>
+          <div id="menu-pages"></div>
+        </nav>
+      </details>
+    </div>
 
     <input
       class="recherche"
