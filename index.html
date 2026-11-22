@@ -408,6 +408,14 @@
     }
     .retour-haut:focus-visible { outline: 2px solid var(--texte); outline-offset: 3px; }
     .erreur-chargement { grid-column: 1 / -1; }
+    .erreur-chargement a {
+      color: var(--or);
+      text-decoration: none;
+    }
+    
+    .erreur-chargement a:hover {
+      text-decoration: underline;
+    }
     .reessayer {
       display: inline-block;
       margin-top: 12px;
