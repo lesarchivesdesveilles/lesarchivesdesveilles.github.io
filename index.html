@@ -328,6 +328,57 @@
       color: #b59b86;
     }
 
+    /* Menu de navigation de la bibliothèque */
+    .entete-exploration {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+    
+    .menu-exploration {
+      position: relative;
+      z-index: 20;
+    }
+    
+    .menu-exploration > summary {
+      list-style: none;
+      cursor: pointer;
+      color: var(--or);
+      font-size: 23px;
+      padding: 5px 10px;
+    }
+    
+    .menu-exploration > summary::-webkit-details-marker {
+      display: none;
+    }
+    
+    .menu-exploration nav {
+      position: absolute;
+      right: 0;
+      top: 100%;
+      width: 220px;
+      padding: 12px;
+      background: var(--carte);
+      border: 1px solid #70533e;
+      border-radius: 10px;
+      box-shadow: 0 8px 25px #0008;
+    }
+    
+    .menu-exploration nav a {
+      display: block;
+      padding: 9px 10px;
+      color: var(--texte);
+      text-decoration: none;
+      font-size: 14px;
+    }
+    
+    .menu-exploration nav a:hover {
+      color: var(--or);
+      background: #493349;
+      border-radius: 5px;
+    }
+
     
   </style>
 </head>
