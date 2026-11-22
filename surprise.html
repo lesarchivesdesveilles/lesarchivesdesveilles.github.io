@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,follow">
+<title>Archive surprise — Les Archives des Veilles</title>
+<style>
+:root{--fond:#171119;--carte:#30222e;--or:#e8bb7e;--texte:#f5e5cb;--discret:#b59b86}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:var(--fond);color:var(--texte);font:16px/1.7 Arial,sans-serif;display:grid;place-items:center;padding:25px}
+main{text-align:center;max-width:540px;padding:35px 25px;border:1px solid #70533e;border-radius:14px;background:var(--carte)}
+h1{font:normal clamp(26px,5vw,38px) Georgia,serif;color:var(--or)}.oeil{font-size:42px;color:var(--or)}p{color:var(--discret)}a,button{color:var(--or)}a:focus-visible,button:focus-visible{outline:2px solid var(--or);outline-offset:4px}button{background:transparent;border:1px solid var(--or);padding:11px 16px;border-radius:8px;cursor:pointer;font:inherit}
+</style>
+</head>
+<body>
+<main>
+<div class="oeil" aria-hidden="true">✦</div>
+<h1>Une archive vous attend…</h1>
+<p id="message" role="status">Le hasard feuillette la bibliothèque.</p>
+<p><a href="index.html">← Retour à la bibliothèque</a></p>
+<button id="reessayer" type="button" hidden>Retenter le tirage</button>
+</main>
+<script>
+const message = document.getElementById('message');
+const reessayer = document.getElementById('reessayer');
+async function tirer() {
+  reessayer.hidden = true;
+  message.textContent = 'Le hasard feuillette la bibliothèque.';
+  try {
+    const reponse = await fetch('index-archives.json', {cache:'no-store'});
+    if (!reponse.ok) throw new Error('Index indisponible');
+    const donnees = await reponse.json();
+    const numeros = Object.entries(donnees)
+      .filter(([numero,archive]) => /^\d+$/.test(numero) && archive && typeof archive === 'object')
+      .map(([numero]) => numero);
+    if (!numeros.length) throw new Error('Aucune archive disponible');
+    const numero = numeros[Math.floor(Math.random()*numeros.length)];
+    const url = new URL('archive.html', location.href);
+    url.searchParams.set('archive', numero);
+    url.searchParams.set('surprise', '1');
+    location.replace(url.href);
+  } catch (erreur) {
+    console.error(erreur);
+    message.textContent = 'Le tirage est momentanément indisponible.';
+    reessayer.hidden = false;
+  }
+}
+reessayer.addEventListener('click', tirer);
+tirer();
+</script>
+</body>
+</html>
