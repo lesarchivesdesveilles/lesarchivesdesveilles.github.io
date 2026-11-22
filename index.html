@@ -796,7 +796,7 @@ function afficherPagination(nombrePages) {
       : galerie;
     const positionCible = cible.getBoundingClientRect().top + window.scrollY;
     retourHaut.classList.toggle("visible", window.scrollY > 450);
-    retourBas.classList.toggle("visible", basPage > 200 && window.scrollY < positionCible - window.innerHeight + 110);
+    retourBas.classList.toggle("visible", basPage > 200 && window.scrollY < 300);
   }
   window.addEventListener("scroll", actualiserFleches, { passive: true });
   window.addEventListener("resize", actualiserFleches);
