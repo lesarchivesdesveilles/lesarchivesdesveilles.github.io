@@ -335,6 +335,51 @@
       margin-top: 2px;
     }
 
+
+    /* Navigation rapide, assortie à la bibliothèque */
+    .navigation-rapide {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      z-index: 80;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      pointer-events: none;
+    }
+    .navigation-rapide button {
+      width: 42px;
+      height: 42px;
+      padding: 0;
+      border: 1px solid var(--or);
+      border-radius: 50%;
+      background: var(--carte);
+      color: var(--or);
+      font: 23px/1 Arial, sans-serif;
+      cursor: pointer;
+      box-shadow: 0 4px 16px #0008;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(8px);
+      transition: opacity .2s, transform .2s, visibility .2s;
+      pointer-events: none;
+    }
+    .navigation-rapide button.visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    .navigation-rapide button:focus-visible {
+      outline: 2px solid var(--texte);
+      outline-offset: 3px;
+    }
+    @media (max-width: 600px) {
+      .navigation-rapide { right: 14px; bottom: 18px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .navigation-rapide button { transition: none; }
+    }
   </style>
 </head>
 
@@ -403,6 +448,12 @@
   </main>
 
 
+
+  <nav class="navigation-rapide" aria-label="Défilement rapide">
+    <button id="aller-haut" type="button" aria-label="Remonter en haut de la fiche" title="Remonter en haut">↑</button>
+    <button id="aller-bas" type="button" aria-label="Descendre au bas de la fiche" title="Descendre en bas">↓</button>
+  </nav>
+
   <footer class="pied-archive">
     <a href="index.html" id="retour-oeil"
        aria-label="Retour à la bibliothèque">
@@ -414,6 +465,31 @@
 
   <script type="module">
     
+
+    // Les flèches ne modifient ni les archives ni leur navigation.
+    const allerHaut = document.getElementById("aller-haut");
+    const allerBas = document.getElementById("aller-bas");
+    const piedArchive = document.querySelector(".pied-archive");
+    function actualiserFleches() {
+      const y = window.scrollY;
+      const defilementPossible = document.documentElement.scrollHeight > window.innerHeight + 50;
+      allerHaut.classList.toggle("visible", defilementPossible && y > 450);
+      allerBas.classList.toggle("visible", defilementPossible && y < 300);
+    }
+    function comportementDefilement() {
+      return window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth";
+    }
+    allerHaut.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: comportementDefilement() });
+    });
+    allerBas.addEventListener("click", () => {
+      piedArchive.scrollIntoView({ behavior: comportementDefilement(), block: "end" });
+    });
+    window.addEventListener("scroll", actualiserFleches, { passive: true });
+    window.addEventListener("resize", actualiserFleches);
+    window.addEventListener("load", actualiserFleches);
+    actualiserFleches();
+
     // Clé API Google Drive
     const CLE_API = "AIzaSyAOworlnq91zYdAVyTkLomMDPDJFlu_fDE";
 
@@ -554,7 +630,8 @@
         if (
           urlRetour.origin === window.location.origin &&
           (urlRetour.pathname === "/" ||
-           urlRetour.pathname === "/index.html")
+           urlRetour.pathname === "/index.html" ||
+           urlRetour.pathname === "/explorer.html")
         ) {
           destinationRetour = urlRetour.pathname + urlRetour.search;
         }
