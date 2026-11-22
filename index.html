@@ -328,7 +328,7 @@
       color: #b59b86;
     }
 
-    /* Menu de navigation de la  */
+    /* Menu de navigation de la bibliothèque */
     .entete-exploration {
       display: flex;
       justify-content: space-between;
@@ -380,6 +380,47 @@
     }
 
     
+    /* Retour discret en haut de la bibliothèque */
+    .retour-haut {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      z-index: 30;
+      width: 46px;
+      height: 46px;
+      border: 1px solid var(--or);
+      border-radius: 50%;
+      background: var(--carte);
+      color: var(--or);
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 4px 16px #0008;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(8px);
+      transition: opacity .2s, transform .2s, visibility .2s;
+    }
+    .retour-haut.visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    .retour-haut:focus-visible { outline: 2px solid var(--texte); outline-offset: 3px; }
+    .erreur-chargement { grid-column: 1 / -1; }
+    .reessayer {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 10px 18px;
+      background: var(--carte);
+      color: var(--or);
+      border: 1px solid var(--or);
+      border-radius: 8px;
+      cursor: pointer;
+      font: inherit;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .retour-haut { transition: none; }
+    }
   </style>
 </head>
 
@@ -435,6 +476,8 @@
     
   </main>
 
+  <button class="retour-haut" id="retour-haut" type="button" aria-label="Revenir en haut de la page" title="Retour en haut">↑</button>
+
   <footer>
     <nav class="liens-sociaux" aria-label="Réseaux sociaux">
       <a href="https://www.facebook.com/lesarchivesdesveilles/">Facebook</a> ·
@@ -454,6 +497,39 @@
   
   let archivesDisponibles = [];
   let pageActuelle = 1;
+  const CLE_POSITION = "ladv-position-bibliotheque";
+  let restaurationEffectuee = false;
+
+  function normaliserRecherche(texte) {
+    return String(texte || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLocaleLowerCase("fr")
+      .replace(/[^\p{L}\p{N}]+/gu, " ")
+      .trim();
+  }
+
+  function memoriserPosition() {
+    try {
+      sessionStorage.setItem(CLE_POSITION, JSON.stringify({
+        url: location.pathname + location.search,
+        y: window.scrollY
+      }));
+    } catch (erreur) { /* Sans stockage, le site reste fonctionnel. */ }
+  }
+
+  function restaurerPosition() {
+    if (restaurationEffectuee) return;
+    restaurationEffectuee = true;
+    try {
+      const sauvegarde = JSON.parse(sessionStorage.getItem(CLE_POSITION) || "null");
+      sessionStorage.removeItem(CLE_POSITION);
+      if (!sauvegarde || sauvegarde.url !== location.pathname + location.search) return;
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        window.scrollTo({ top: sauvegarde.y, behavior: "instant" });
+      }));
+    } catch (erreur) { /* Sans stockage, le site reste fonctionnel. */ }
+  }
   
   const parametresInitiaux = new URLSearchParams(window.location.search);
   
@@ -504,10 +580,10 @@
   
   async function chargerArchives() {
     try {
-      const reponse = await fetch("archives.json");
+      const reponse = await fetch("index-archives.json");
   
       if (!reponse.ok) {
-        throw new Error("Impossible de charger archives.json");
+        throw new Error("Impossible de charger index-archives.json");
       }
   
       const archives = await reponse.json();
@@ -516,17 +592,35 @@
         .sort(([a], [b]) => Number(b) - Number(a));
   
       afficherPage();
+      restaurerPosition();
   
     } catch (erreur) {
       console.error(erreur);
-      galerie.textContent =
-        "Impossible de charger les archives pour le moment.";
+      galerie.replaceChildren();
+      pagination.replaceChildren();
+      const bloc = document.createElement("div");
+      bloc.className = "erreur-chargement";
+      const message = document.createElement("p");
+      message.textContent = "Impossible de charger les archives pour le moment.";
+      const bouton = document.createElement("button");
+      bouton.type = "button";
+      bouton.className = "reessayer";
+      bouton.textContent = "Réessayer";
+      bouton.addEventListener("click", chargerArchives);
+      const secours = document.createElement("p");
+      const lien = document.createElement("a");
+      lien.href = "explorer.html";
+      lien.textContent = "Accéder à l’index des archives";
+      secours.appendChild(lien);
+      bloc.append(message, bouton, secours);
+      galerie.appendChild(bloc);
     }
   }
   
   function creerCarte(numero, archive) {
     const lien = document.createElement("a");
     lien.className = "archive";
+    lien.addEventListener("click", memoriserPosition);
       
     const retour = window.location.pathname + window.location.search;
 
@@ -570,24 +664,23 @@
     return lien;
   }
   
-  function archivesFiltrees() {
-    const texte = recherche.value
-      .trim()
-      .toLocaleLowerCase("fr");
-  
-    return archivesDisponibles.filter(([numero, archive]) => {
-      const contenu = [
-        numero,
-        archive.titre || "",
-        archive.sousTitre || "",
-        archive.source || ""
-      ].join(" ").toLocaleLowerCase("fr");
-  
-      return contenu.includes(texte);
-    });
-  }
-  
-  function afficherPage() {
+     function archivesFiltrees() {
+     const mots = normaliserRecherche(recherche.value).split(/\s+/).filter(Boolean);
+     if (!mots.length) return archivesDisponibles;
+
+     return archivesDisponibles.filter(([numero, archive]) => {
+       const contenu = normaliserRecherche([
+         numero,
+         archive.titre || "",
+         archive.sousTitre || "",
+         archive.source || ""
+       ].join(" "));
+
+       return mots.every(mot => contenu.includes(mot));
+     });
+   }
+
+function afficherPage() {
     const resultats = archivesFiltrees();
     const nombrePages = Math.ceil(resultats.length / PAR_PAGE);
   
@@ -687,6 +780,17 @@ function afficherPagination(nombrePages) {
     afficherPage();
     synchroniserURL();
   });
+
+  const retourHaut = document.getElementById("retour-haut");
+  function actualiserRetourHaut() {
+    retourHaut.classList.toggle("visible", window.scrollY > 450);
+  }
+  window.addEventListener("scroll", actualiserRetourHaut, { passive: true });
+  retourHaut.addEventListener("click", () => {
+    const mouvementReduit = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({ top: 0, behavior: mouvementReduit ? "instant" : "smooth" });
+  });
+  actualiserRetourHaut();
 
   chargerArchives();
 
