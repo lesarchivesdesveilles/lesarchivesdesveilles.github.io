@@ -407,6 +407,19 @@
       font-size: 14px;
     }
     
+    .menu-exploration nav a {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+
+    .icone-menu {
+      width: 18px;
+      height: 18px;
+      flex: 0 0 18px;
+      color: var(--or);
+    }
+
     .menu-exploration nav a:hover {
       color: var(--or);
       background: #493349;
@@ -487,10 +500,10 @@
                  title="Navigation">☰</summary>
   
         <nav aria-label="Explorer la bibliothèque">
-          <a href="index.html">Accueil des Archives</a>
-          <a href="explorer.html">Index des titres</a>
-          <a href="explorer.html?vue=themes">Par thématique</a>
-          <a href="surprise.html">✦ Archive surprise</a>
+          <a href="index.html"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg><span>Accueil des Archives</span></a>
+          <a href="explorer.html"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/></svg><span>Index des titres</span></a>
+          <a href="explorer.html?vue=themes"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Par thématique</span></a>
+          <a href="surprise.html"><svg class="icone-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z"/><circle cx="12" cy="12" r="3"/></svg><span>Archive surprise</span></a>
           <div id="menu-pages"></div>
         </nav>
       </details>
