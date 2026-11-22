@@ -386,13 +386,13 @@
       right: 22px;
       bottom: 22px;
       z-index: 30;
-      width: 46px;
-      height: 46px;
+      width: 42px;
+      height: 42px;
       border: 1px solid var(--or);
       border-radius: 50%;
       background: var(--carte);
       color: var(--or);
-      font-size: 24px;
+      font-size: 21px;
       cursor: pointer;
       box-shadow: 0 4px 16px #0008;
       opacity: 0;
@@ -400,6 +400,7 @@
       transform: translateY(8px);
       transition: opacity .2s, transform .2s, visibility .2s;
     }
+    .retour-bas { bottom: 74px; }
     .retour-haut.visible {
       opacity: 1;
       visibility: visible;
@@ -475,6 +476,8 @@
   </nav>
     
   </main>
+
+  <button class="retour-haut retour-bas" id="retour-bas" type="button" aria-label="Descendre à la pagination" title="Aller à la pagination">↓</button>
 
   <button class="retour-haut" id="retour-haut" type="button" aria-label="Revenir en haut de la page" title="Retour en haut">↑</button>
 
@@ -705,6 +708,7 @@ function afficherPage() {
     }
   
     afficherPagination(nombrePages);
+    requestAnimationFrame(actualiserFleches);
   }
   
   
@@ -782,15 +786,28 @@ function afficherPagination(nombrePages) {
   });
 
   const retourHaut = document.getElementById("retour-haut");
-  function actualiserRetourHaut() {
+  const retourBas = document.getElementById("retour-bas");
+  const mouvementReduit = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  function actualiserFleches() {
+    const basPage = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    const cible = pagination.getClientRects().length && pagination.children.length
+      ? pagination
+      : galerie;
+    const positionCible = cible.getBoundingClientRect().top + window.scrollY;
     retourHaut.classList.toggle("visible", window.scrollY > 450);
+    retourBas.classList.toggle("visible", basPage > 200 && window.scrollY < positionCible - window.innerHeight + 110);
   }
-  window.addEventListener("scroll", actualiserRetourHaut, { passive: true });
+  window.addEventListener("scroll", actualiserFleches, { passive: true });
+  window.addEventListener("resize", actualiserFleches);
   retourHaut.addEventListener("click", () => {
-    const mouvementReduit = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    window.scrollTo({ top: 0, behavior: mouvementReduit ? "instant" : "smooth" });
+    window.scrollTo({ top: 0, behavior: mouvementReduit.matches ? "instant" : "smooth" });
   });
-  actualiserRetourHaut();
+  retourBas.addEventListener("click", () => {
+    const cible = pagination.children.length ? pagination : galerie;
+    cible.scrollIntoView({ behavior: mouvementReduit.matches ? "instant" : "smooth", block: "end" });
+  });
+  actualiserFleches();
 
   chargerArchives();
 
