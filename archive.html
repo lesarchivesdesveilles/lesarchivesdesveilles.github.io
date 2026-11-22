@@ -642,12 +642,14 @@
       }
 
       if (syntheseSeule) {
-        // Mettre l'unique image en premier, avant le récit.
+        // Masquer les aperçus et conserver le récit avant la synthèse.
         const blocSynthese = document.getElementById("bloc-synthese");
         const blocInfographies = document.getElementById("bloc-infographies");
+      
         blocInfographies.hidden = true;
-        blocSynthese.querySelector("h2").textContent = "✦ L'infographie de synthèse";
-        blocInfographies.after(blocSynthese);
+      
+        blocSynthese.querySelector("h2").textContent =
+          "✦ L'infographie de synthèse";
       }
 
       // Métadonnées propres à chaque archive (mises à jour côté navigateur).
