@@ -702,6 +702,12 @@ function afficherPagination(nombrePages) {
     }
   });
 
+  document.addEventListener("keydown", (evenement) => {
+    if (evenement.key === "Escape") {
+      menuExploration.open = false;
+    }
+  });
+
   </script>
 
 </body>
