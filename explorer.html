@@ -58,6 +58,12 @@
       background: transparent; border: 1px solid #70533e;
       color: var(--or); padding: 9px; border-radius: 7px; cursor: pointer;
     }
+    .pagination { display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:8px; margin:35px auto 0; }
+    .pagination button { min-width:42px; min-height:42px; padding:9px 12px; background:#30222e; color:var(--texte); border:1px solid #70533e; border-radius:8px; font-size:15px; cursor:pointer; }
+    .pagination button:hover:not(:disabled) { background:#463044; border-color:var(--or); }
+    .pagination button.actif { background:var(--or); color:var(--fond); border-color:var(--or); font-weight:bold; }
+    .pagination button:disabled { opacity:.35; cursor:default; }
+    .pagination .points { padding:0 4px; color:var(--discret); }
     .cache { display: none !important; }
     footer { text-align: center; color: var(--discret); font-size: 12px; border-top: 1px solid #70533e; }
     @media (max-width: 550px) {
@@ -66,6 +72,8 @@
       .titre { font-size: 13px; }
       .onglets button { font-size: 13px; }
       .theme { font-size: 14px; }
+      .pagination { gap:5px; }
+      .pagination button { min-width:38px; padding:8px; }
     }
   </style>
 </head>
@@ -88,6 +96,7 @@
       <button type="button" id="retour-themes" class="cache">← Toutes les thématiques</button>
     </div>
     <section id="resultats" aria-live="polite"></section>
+    <nav class="pagination" id="pagination" aria-label="Pages des archives"></nav>
   </main>
 
   <footer>© 2026 Les Archives des Veilles</footer>
@@ -98,6 +107,8 @@
     const indication = document.getElementById('indication');
     const retourThemes = document.getElementById('retour-themes');
     const retourBibliotheque = document.getElementById('retour-bibliotheque');
+    const pagination = document.getElementById('pagination');
+    const PAR_PAGE = 24;
 
     // Retour à la page précédente du site, sans envoyer vers un site externe.
     // En accès direct ou depuis un autre site, retour classique à l'accueil.
@@ -121,12 +132,15 @@
     let vue = new URLSearchParams(location.search).get('vue') === 'themes' ? 'themes' : 'titres';
     let themeActif = vue === 'themes' ? new URLSearchParams(location.search).get('theme') : null;
     recherche.value = new URLSearchParams(location.search).get('q') || '';
+    let pageActuelle = Math.max(1, Number.parseInt(new URLSearchParams(location.search).get('page'), 10) || 1);
 
     function memoriserNavigation() {
       const url = new URL(location.href);
       url.searchParams.set('vue', vue);
       if (vue === 'themes' && themeActif) url.searchParams.set('theme', themeActif);
       else url.searchParams.delete('theme');
+      if (pageActuelle > 1) url.searchParams.set('page', String(pageActuelle));
+      else url.searchParams.delete('page');
       if (recherche.value.trim()) url.searchParams.set('q', recherche.value.trim());
       else url.searchParams.delete('q');
       history.replaceState(null, '', url);
@@ -167,12 +181,56 @@
     function changerVue(v) {
       vue = v;
       themeActif = null;
+      pageActuelle = 1;
       memoriserNavigation();
       afficher();
     }
 
+    function afficherPagination(nombrePages) {
+      pagination.replaceChildren();
+      if (nombrePages <= 1) return;
+      function ajouterBouton(texte, page, actif = false, desactive = false, description = '') {
+        const bouton = document.createElement('button');
+        bouton.type = 'button';
+        bouton.textContent = texte;
+        bouton.disabled = desactive;
+        if (description) { bouton.setAttribute('aria-label', description); bouton.title = description; }
+        if (actif) { bouton.classList.add('actif'); bouton.setAttribute('aria-current', 'page'); }
+        bouton.onclick = () => {
+          pageActuelle = page;
+          memoriserNavigation();
+          afficher();
+          document.querySelector('.actions').scrollIntoView({block:'start', behavior:'instant'});
+        };
+        pagination.appendChild(bouton);
+      }
+      function ajouterPoints() {
+        const points = document.createElement('span');
+        points.className = 'points';
+        points.textContent = '…';
+        points.setAttribute('aria-hidden', 'true');
+        pagination.appendChild(points);
+      }
+      ajouterBouton('«', 1, false, pageActuelle === 1, 'Première page');
+      ajouterBouton('‹', pageActuelle - 1, false, pageActuelle === 1, 'Page précédente');
+      const pages = new Set([1, nombrePages]);
+      for (let p = pageActuelle - 1; p <= pageActuelle + 1; p++) {
+        if (p >= 1 && p <= nombrePages) pages.add(p);
+      }
+      let precedente = 0;
+      for (const page of [...pages].sort((a,b)=>a-b)) {
+        if (precedente && page - precedente === 2) ajouterBouton(String(precedente + 1), precedente + 1);
+        else if (precedente && page - precedente > 2) ajouterPoints();
+        ajouterBouton(String(page), page, page === pageActuelle);
+        precedente = page;
+      }
+      ajouterBouton('›', pageActuelle + 1, false, pageActuelle === nombrePages, 'Page suivante');
+      ajouterBouton('»', nombrePages, false, pageActuelle === nombrePages, 'Dernière page');
+    }
+
     function afficher() {
       resultats.replaceChildren();
+      pagination.replaceChildren();
       const q = normaliser(recherche.value.trim());
       document.getElementById('tab-titres').setAttribute('aria-selected', String(vue === 'titres'));
       document.getElementById('tab-themes').setAttribute('aria-selected', String(vue === 'themes'));
@@ -188,7 +246,12 @@
           .sort(ordre);
         const nomTheme = themeActif ? themes.find(t => t.id === themeActif)?.nom : '';
         indication.textContent = `${nomTheme ? nomTheme + ' · ' : ''}${liste.length} archive(s)`;
-        for (const a of liste) resultats.append(lienArchive(a));
+        const nombrePages = Math.max(1, Math.ceil(liste.length / PAR_PAGE));
+        if (pageActuelle > nombrePages) { pageActuelle = nombrePages; memoriserNavigation(); }
+        for (const a of liste.slice((pageActuelle - 1) * PAR_PAGE, pageActuelle * PAR_PAGE)) {
+          resultats.append(lienArchive(a));
+        }
+        afficherPagination(nombrePages);
         if (!liste.length) resultats.textContent = 'Aucune archive trouvée.';
         return;
       }
@@ -207,7 +270,7 @@
         nombre.textContent = `${total} archive(s) ›`;
 
         bouton.append(nom, nombre);
-        bouton.onclick = () => { themeActif = t.id; memoriserNavigation(); afficher(); };
+        bouton.onclick = () => { themeActif = t.id; pageActuelle = 1; memoriserNavigation(); afficher(); };
         resultats.append(bouton);
       }
 
@@ -222,13 +285,14 @@
 
     document.getElementById('tab-titres').onclick = () => changerVue('titres');
     document.getElementById('tab-themes').onclick = () => changerVue('themes');
-    retourThemes.onclick = () => { themeActif = null; memoriserNavigation(); afficher(); };
-    recherche.oninput = () => { memoriserNavigation(); afficher(); };
+    retourThemes.onclick = () => { themeActif = null; pageActuelle = 1; memoriserNavigation(); afficher(); };
+    recherche.oninput = () => { pageActuelle = 1; memoriserNavigation(); afficher(); };
     window.addEventListener('popstate', () => {
       const params = new URLSearchParams(location.search);
       vue = params.get('vue') === 'themes' ? 'themes' : 'titres';
       themeActif = vue === 'themes' ? params.get('theme') : null;
       recherche.value = params.get('q') || '';
+      pageActuelle = Math.max(1, Number.parseInt(params.get('page'), 10) || 1);
       afficher();
     });
 
