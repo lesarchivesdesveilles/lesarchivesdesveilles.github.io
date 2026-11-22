@@ -15,6 +15,44 @@
     * { box-sizing: border-box; }
     body { margin: 0; background: var(--fond); color: var(--texte); font: 16px/1.6 Arial, sans-serif; }
     header, main, footer { max-width: 900px; margin: auto; padding: 25px 20px; }
+    .bandeau-explorateur {
+      height: clamp(145px, 20vw, 245px);
+      background-image: linear-gradient(to bottom, transparent 55%, var(--fond) 100%), url("bandeaux/accueil.webp");
+      background-size: cover;
+      background-position: center 35%;
+      background-repeat: no-repeat;
+    }
+    .recherche-conteneur { position: relative; }
+    .recherche-conteneur .recherche { padding-right: 54px; }
+    .recherche::-webkit-search-cancel-button { display: none; -webkit-appearance: none; appearance: none; }
+    .effacer-recherche {
+      position: absolute; right: 7px; top: 50%; transform: translateY(-50%);
+      width: 38px; height: 38px; border: 0; border-radius: 8px;
+      background: transparent; color: var(--or); font-size: 25px;
+      line-height: 1; cursor: pointer;
+    }
+    .effacer-recherche:hover { background: #493349; }
+    .effacer-recherche[hidden] { display: none; }
+    .navigation-rapide {
+      position: fixed; right: 22px; bottom: 22px; z-index: 30;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .navigation-rapide button {
+      width: 42px; height: 42px; border: 1px solid var(--or);
+      border-radius: 50%; background: var(--carte); color: var(--or);
+      font-size: 23px; cursor: pointer; box-shadow: 0 4px 16px #0008;
+      opacity: 0; visibility: hidden; transform: translateY(8px);
+      transition: opacity .2s, transform .2s, visibility .2s;
+    }
+    .navigation-rapide button.visible { opacity: 1; visibility: visible; transform: translateY(0); }
+    .navigation-rapide button:hover { background: #493349; }
+    @media (max-width: 550px) {
+      .bandeau-explorateur { height: 135px; background-position: center 30%; }
+      .navigation-rapide { right: 14px; bottom: 18px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .navigation-rapide button { transition: none; }
+    }
     header { text-align: center; border-bottom: 1px solid #70533e; }
     h1, h2 { font-family: Georgia, serif; font-weight: normal; }
     h1 { color: var(--or); }
@@ -38,7 +76,7 @@
       border-bottom: 1px solid #493349;
     }
     .ligne:hover, .theme:hover { background: #3b2a3b; }
-    .ligne:focus-visible, .theme:focus-visible, button:focus-visible, .recherche:focus-visible {
+    .ligne:focus-visible, .theme:focus-visible, button:focus-visible, .recherche:focus-visible, .retour:focus-visible {
       outline: 2px solid var(--or); outline-offset: 2px;
     }
     .num { color: var(--or); font-size: 12px; min-width: 58px; font-variant-numeric: tabular-nums; }
@@ -78,6 +116,7 @@
   </style>
 </head>
 <body>
+  <div class="bandeau-explorateur" role="img" aria-label="Œil doré entouré d’archives anciennes"></div>
   <header>
     <a class="retour" id="retour-bibliotheque" href="index.html">← Retour à la bibliothèque</a>
     <h1>Explorer les archives</h1>
@@ -89,8 +128,12 @@
       <button id="tab-titres" type="button" role="tab" aria-selected="true">Toutes les archives</button>
       <button id="tab-themes" type="button" role="tab" aria-selected="false">Par thématique</button>
     </div>
-    <input class="recherche" type="search" id="recherche"
-           placeholder="Rechercher un titre ou un numéro…" aria-label="Rechercher une archive">
+    <div class="recherche-conteneur">
+      <input class="recherche" type="search" id="recherche"
+             placeholder="Rechercher un titre ou un numéro…" aria-label="Rechercher une archive">
+      <button class="effacer-recherche" id="effacer-recherche" type="button"
+              aria-label="Effacer la recherche" title="Effacer la recherche" hidden>×</button>
+    </div>
     <div class="actions">
       <span id="indication" class="aide"></span>
       <button type="button" id="retour-themes" class="cache">← Toutes les thématiques</button>
@@ -98,6 +141,11 @@
     <section id="resultats" aria-live="polite"></section>
     <nav class="pagination" id="pagination" aria-label="Pages des archives"></nav>
   </main>
+
+  <div class="navigation-rapide" aria-label="Navigation rapide">
+    <button id="aller-haut" type="button" aria-label="Remonter en haut" title="Retour en haut">↑</button>
+    <button id="aller-bas" type="button" aria-label="Descendre vers la pagination" title="Vers la pagination">↓</button>
+  </div>
 
   <footer>© 2026 Les Archives des Veilles</footer>
 
@@ -109,6 +157,30 @@
     const retourBibliotheque = document.getElementById('retour-bibliotheque');
     const pagination = document.getElementById('pagination');
     const PAR_PAGE = 24;
+    const effacerRecherche = document.getElementById('effacer-recherche');
+    const allerHaut = document.getElementById('aller-haut');
+    const allerBas = document.getElementById('aller-bas');
+    const mouvementReduit = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function actualiserCroix() { effacerRecherche.hidden = recherche.value.length === 0; }
+    function actualiserFleches() {
+      const defilable = document.documentElement.scrollHeight > window.innerHeight + 40;
+      allerHaut.classList.toggle('visible', defilable && window.scrollY > 450);
+      allerBas.classList.toggle('visible', defilable && window.scrollY < 300);
+    }
+    allerHaut.addEventListener('click', () => window.scrollTo({top: 0, behavior: mouvementReduit() ? 'instant' : 'smooth'}));
+    allerBas.addEventListener('click', () => {
+      const cible = pagination.children.length ? pagination : resultats;
+      cible.scrollIntoView({block: 'end', behavior: mouvementReduit() ? 'instant' : 'smooth'});
+    });
+    effacerRecherche.addEventListener('click', () => {
+      recherche.value = '';
+      recherche.dispatchEvent(new Event('input', {bubbles: true}));
+      recherche.focus();
+    });
+    window.addEventListener('scroll', actualiserFleches, {passive: true});
+    window.addEventListener('resize', actualiserFleches);
+    actualiserCroix();
+    actualiserFleches();
 
     // Retour à la page précédente du site, sans envoyer vers un site externe.
     // En accès direct ou depuis un autre site, retour classique à l'accueil.
@@ -236,6 +308,8 @@
     function afficher() {
       resultats.replaceChildren();
       pagination.replaceChildren();
+      actualiserCroix();
+      requestAnimationFrame(actualiserFleches);
       const q = normaliser(recherche.value.trim());
       document.getElementById('tab-titres').setAttribute('aria-selected', String(vue === 'titres'));
       document.getElementById('tab-themes').setAttribute('aria-selected', String(vue === 'themes'));
@@ -318,6 +392,7 @@
     }).catch(e => {
       console.error(e);
       resultats.textContent = 'Impossible de charger les archives pour le moment.';
+      requestAnimationFrame(actualiserFleches);
     });
   </script>
 </body>
