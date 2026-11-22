@@ -168,7 +168,12 @@
       titre.className = 'titre';
       const titrePrincipal = String(a.titre || `Archive ${a.numero}`).trim();
       const sousTitre = String(a.sousTitre || '').trim();
-      titre.textContent = sousTitre ? `${titrePrincipal} : ${sousTitre}` : titrePrincipal;
+      // Minuscule initiale après « : », sauf sigles et noms propres connus.
+      const exceptions = /^(?:IA|ADN|OVNI|USA|NASA|ONU)\b/;
+      const sousTitreAffiche = exceptions.test(sousTitre)
+        ? sousTitre
+        : sousTitre.replace(/^(\p{L})/u, lettre => lettre.toLocaleLowerCase('fr'));
+      titre.textContent = sousTitre ? `${titrePrincipal} : ${sousTitreAffiche}` : titrePrincipal;
 
       const fleche = document.createElement('span');
       fleche.className = 'fleche';
