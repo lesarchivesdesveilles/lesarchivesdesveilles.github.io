@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, follow">
+  <meta name="theme-color" content="#171119">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <title>Archive introuvable — Les Archives des Veilles</title>
+  <style>
+    :root { --fond:#171119; --carte:#30222e; --or:#e8bb7e; --texte:#f5e5cb; --discret:#b59b86; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; background:radial-gradient(ellipse at 50% 30%,#382435 0%,var(--fond) 70%); color:var(--texte); font-family:Arial,sans-serif; line-height:1.6; display:flex; flex-direction:column; }
+    main { flex:1; display:flex; align-items:center; justify-content:center; padding:48px 20px; }
+    .contenu { max-width:690px; text-align:center; }
+    .signature { color:var(--or); letter-spacing:.24em; text-transform:uppercase; font-size:12px; }
+    .symbole { margin:28px auto 12px; width:130px; height:130px; border:1px solid #70533e; border-radius:50%; display:grid; place-items:center; box-shadow:0 0 60px #e8bb7e12,inset 0 0 35px #e8bb7e12; position:relative; }
+    .symbole::before,.symbole::after { content:""; position:absolute; border:1px solid #70533e; border-radius:50%; inset:12px; }
+    .symbole::after { inset:26px; border-style:dashed; opacity:.65; }
+    .symbole span { font:normal 50px Georgia,serif; color:var(--or); z-index:1; }
+    h1 { font:normal clamp(32px,6vw,52px) Georgia,serif; color:var(--or); margin:14px 0; }
+    .description { max-width:520px; margin:0 auto; font-size:17px; }
+    .murmure { color:var(--discret); margin:15px auto 30px; max-width:520px; font-style:italic; }
+    .actions { display:flex; justify-content:center; gap:12px; flex-wrap:wrap; }
+    .bouton { display:inline-block; padding:12px 20px; border-radius:7px; border:1px solid var(--or); background:var(--or); color:var(--fond); text-decoration:none; font-weight:bold; transition:transform .15s,background .15s; }
+    .bouton:hover { transform:translateY(-2px); background:#f5d3a4; }
+    .bouton.secondaire { background:transparent; color:var(--or); }
+    .bouton.secondaire:hover { background:#30222e; }
+    .bouton:focus-visible { outline:3px solid var(--texte); outline-offset:4px; }
+    footer { padding:20px; border-top:1px solid #70533e; color:var(--discret); text-align:center; font-size:12px; }
+    @media (prefers-reduced-motion:reduce) { .bouton { transition:none; } }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="contenu">
+      <div class="signature">Les Archives des Veilles</div>
+      <div class="symbole" aria-hidden="true"><span>404</span></div>
+      <h1>Cette archive a disparu…</h1>
+      <p class="description">La page que vous recherchez semble s’être égarée entre deux lignes de temps.</p>
+      <p class="murmure">Peut-être n’a-t-elle jamais existé… ou peut-être attend-elle d’être retrouvée.</p>
+      <nav class="actions" aria-label="Retrouver les archives">
+        <a class="bouton" href="/">Retour à la bibliothèque</a>
+        <a class="bouton secondaire" href="/explorer.html">Explorer les archives</a>
+      </nav>
+    </div>
+  </main>
+  <footer>Les Archives des Veilles · Certaines pistes méritent d’être retrouvées.</footer>
+</body>
+</html>
