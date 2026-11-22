@@ -1,0 +1,54 @@
+[
+  {
+    "id": "matrice",
+    "nom": "Matrice – Archétypes – Entités"
+  },
+  {
+    "id": "institutions",
+    "nom": "Élections – Gouvernements – Institutions"
+  },
+  {
+    "id": "lieux",
+    "nom": "Mystères des lieux"
+  },
+  {
+    "id": "systemes",
+    "nom": "Systèmes invisibles – Dystopie – Surveillance – Contrôle"
+  },
+  {
+    "id": "societe",
+    "nom": "Société – Conditionnement – Figurants – Illusions du réel"
+  },
+  {
+    "id": "fantastique",
+    "nom": "Fantastique – Mythes et Légendes (ou pas) – Cryptides"
+  },
+  {
+    "id": "sante",
+    "nom": "Santé – Bien-être"
+  },
+  {
+    "id": "temps",
+    "nom": "Lignes de temps – Reset"
+  },
+  {
+    "id": "prospectives",
+    "nom": "Prospectives"
+  },
+  {
+    "id": "vivant",
+    "nom": "Nature – Animaux – Conscience du vivant"
+  },
+  {
+    "id": "incarnations",
+    "nom": "Chroniques d’incarnations"
+  },
+  {
+    "id": "mort",
+    "nom": "Après la mort"
+  },
+  {
+    "id": "relations",
+    "nom": "Relations – Famille – Transmission"
+  }
+]
