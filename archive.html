@@ -329,10 +329,11 @@
       }
     }
     
-  /* Rapprocher le premier encadré de la navigation */
-  #bloc-infographies {
-    margin-top: 2px;
-  }
+  /* Espacement uniforme sous la navigation */
+    .navigation-archives + .bloc,
+    .navigation-archives + .bloc[hidden] + .bloc {
+      margin-top: 2px;
+    }
 
   </style>
 </head>
