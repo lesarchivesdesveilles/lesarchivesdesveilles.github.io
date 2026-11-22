@@ -6,46 +6,121 @@
 <meta name="robots" content="noindex,follow">
 <title>Archive surprise — Les Archives des Veilles</title>
 <style>
-:root{--fond:#171119;--carte:#30222e;--or:#e8bb7e;--texte:#f5e5cb;--discret:#b59b86}
-*{box-sizing:border-box}body{margin:0;min-height:100vh;background:var(--fond);color:var(--texte);font:16px/1.7 Arial,sans-serif;display:grid;place-items:center;padding:25px}
-main{text-align:center;max-width:540px;padding:35px 25px;border:1px solid #70533e;border-radius:14px;background:var(--carte)}
-h1{font:normal clamp(26px,5vw,38px) Georgia,serif;color:var(--or)}.oeil{font-size:42px;color:var(--or)}p{color:var(--discret)}a,button{color:var(--or)}a:focus-visible,button:focus-visible{outline:2px solid var(--or);outline-offset:4px}button{background:transparent;border:1px solid var(--or);padding:11px 16px;border-radius:8px;cursor:pointer;font:inherit}
+:root{--fond:#171119;--or:#e8bb7e;--texte:#f5e5cb;--discret:#b59b86}
+*{box-sizing:border-box}
+html{background:var(--fond)}
+body{margin:0;min-height:100svh;overflow:hidden;background:radial-gradient(ellipse at center,#352237 0%,#201623 44%,#171119 78%);color:var(--texte);font:16px/1.6 Arial,sans-serif;display:grid;place-items:center;padding:24px}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:3;background:repeating-linear-gradient(to bottom,transparent 0px,transparent 3px,rgba(0,0,0,.12) 4px);opacity:.55}
+canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;opacity:.32}
+.scene{position:relative;z-index:2;text-align:center;width:min(100%,650px);padding:40px 18px}
+.halo{position:relative;width:clamp(130px,25vw,205px);height:clamp(130px,25vw,205px);margin:0 auto 27px;display:grid;place-items:center;filter:drop-shadow(0 0 25px rgba(232,187,126,.24));animation:respirer 2.7s ease-in-out infinite}
+.halo::before,.halo::after{content:"";position:absolute;inset:9%;border:1px solid rgba(232,187,126,.35);border-radius:50%;box-shadow:0 0 22px rgba(232,187,126,.12)}
+.halo::after{inset:0;border-style:dashed;border-color:rgba(232,187,126,.2);animation:tourner 17s linear infinite}
+.oeil{width:76%;height:auto;display:block;filter:drop-shadow(0 0 10px rgba(232,187,126,.4))}
+.signature{font-size:11px;letter-spacing:.33em;color:var(--or);opacity:.8;margin-bottom:18px}
+h1{position:relative;font:normal clamp(29px,6vw,48px)/1.2 Georgia,serif;color:var(--or);margin:0 0 18px;text-shadow:0 0 22px rgba(232,187,126,.22)}
+h1::before,h1::after{content:attr(data-texte);position:absolute;inset:0;opacity:0;pointer-events:none}
+h1::before{color:#eec6dc;text-shadow:-3px 0 #a87d96;animation:glitchA 3.6s steps(1,end) infinite}
+h1::after{color:#f4d4a4;text-shadow:3px 0 #826179;animation:glitchB 3.6s steps(1,end) infinite}
+#message{font-size:14px;letter-spacing:.04em;color:var(--discret);min-height:25px;margin:0 auto 20px}
+.filet{height:1px;width:min(300px,70%);margin:0 auto 23px;background:linear-gradient(90deg,transparent,rgba(232,187,126,.75),transparent);transform-origin:center;animation:filet 3.8s ease-in-out both}
+.retour{display:inline-block;color:var(--or);font-size:13px;text-decoration:none;padding:8px 12px;opacity:.8}
+.retour:hover{text-decoration:underline;opacity:1}
+a:focus-visible,button:focus-visible{outline:2px solid var(--or);outline-offset:4px}
+button{display:block;margin:16px auto 0;background:#30222e;border:1px solid var(--or);color:var(--or);padding:11px 16px;border-radius:8px;cursor:pointer;font:inherit}
+[hidden]{display:none!important}
+.flash{position:fixed;inset:0;z-index:4;pointer-events:none;background:#e8bb7e;opacity:0}
+body.depart .flash{animation:flash .42s ease-out forwards}
+body.depart .scene{animation:disparition .42s steps(3,end) forwards}
+@keyframes respirer{0%,100%{transform:scale(.97);opacity:.85}50%{transform:scale(1.05);opacity:1}}
+@keyframes tourner{to{transform:rotate(360deg)}}
+@keyframes filet{0%{transform:scaleX(.1);opacity:0}35%,75%{transform:scaleX(1);opacity:1}100%{transform:scaleX(.35);opacity:.4}}
+@keyframes glitchA{0%,24%,27%,61%,64%,100%{opacity:0;transform:none;clip-path:inset(0)}25%{opacity:.8;transform:translate(-5px,1px);clip-path:inset(15% 0 55% 0)}26%{opacity:.8;transform:translate(3px,-1px);clip-path:inset(60% 0 10% 0)}62%{opacity:.7;transform:translate(-4px,0);clip-path:inset(45% 0 35% 0)}63%{opacity:.7;transform:translate(4px,0);clip-path:inset(5% 0 75% 0)}}
+@keyframes glitchB{0%,24%,27%,61%,64%,100%{opacity:0;transform:none;clip-path:inset(0)}25%{opacity:.65;transform:translate(5px,-1px);clip-path:inset(48% 0 20% 0)}26%{opacity:.6;transform:translate(-3px,1px);clip-path:inset(8% 0 68% 0)}62%{opacity:.8;transform:translate(4px,0);clip-path:inset(18% 0 60% 0)}63%{opacity:.8;transform:translate(-4px,0);clip-path:inset(70% 0 7% 0)}}
+@keyframes flash{0%{opacity:0}32%{opacity:.34}100%{opacity:0}}
+@keyframes disparition{0%{opacity:1;transform:none}35%{transform:translateX(-7px);filter:contrast(1.7)}70%{transform:translateX(8px);opacity:.7}100%{opacity:0;transform:scale(1.04)}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}canvas{display:none}body.depart .scene{opacity:.5}}
 </style>
 </head>
 <body>
-<main>
-<div class="oeil" aria-hidden="true">✦</div>
-<h1>Une archive vous attend…</h1>
-<p id="message" role="status">Le hasard feuillette la bibliothèque.</p>
-<p><a href="index.html">← Retour à la bibliothèque</a></p>
+<canvas id="pluie" aria-hidden="true"></canvas>
+<main class="scene">
+<div class="signature">✦ LES ARCHIVES DES VEILLES ✦</div>
+<div class="halo" aria-hidden="true">
+<svg class="oeil" viewBox="0 0 220 140" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 70Q110-34 208 70Q110 174 12 70Z" stroke="#e8bb7e" stroke-width="3"/><path d="M27 70Q110-16 193 70Q110 156 27 70Z" stroke="#e8bb7e" stroke-width="1" opacity=".42"/><circle cx="110" cy="70" r="37" stroke="#e8bb7e" stroke-width="2.5"/><circle cx="110" cy="70" r="24" fill="#e8bb7e" opacity=".18"/><circle cx="110" cy="70" r="13" fill="#e8bb7e"/><circle cx="104" cy="63" r="4" fill="#fff0d8"/></svg>
+</div>
+<h1 data-texte="Une archive vous attend…">Une archive vous attend…</h1>
+<p id="message" role="status">Le hasard feuillette la bibliothèque…</p>
+<div class="filet" aria-hidden="true"></div>
+<a class="retour" href="index.html">← Retour à la bibliothèque</a>
 <button id="reessayer" type="button" hidden>Retenter le tirage</button>
 </main>
+<div class="flash" aria-hidden="true"></div>
 <script>
-const message = document.getElementById('message');
-const reessayer = document.getElementById('reessayer');
-async function tirer() {
-  reessayer.hidden = true;
-  message.textContent = 'Le hasard feuillette la bibliothèque.';
-  try {
-    const reponse = await fetch('index-archives.json', {cache:'no-store'});
-    if (!reponse.ok) throw new Error('Index indisponible');
-    const donnees = await reponse.json();
-    const numeros = Object.entries(donnees)
-      .filter(([numero,archive]) => /^\d+$/.test(numero) && archive && typeof archive === 'object')
-      .map(([numero]) => numero);
-    if (!numeros.length) throw new Error('Aucune archive disponible');
-    const numero = numeros[Math.floor(Math.random()*numeros.length)];
-    const url = new URL('archive.html', location.href);
-    url.searchParams.set('archive', numero);
-    url.searchParams.set('surprise', '1');
-    location.replace(url.href);
-  } catch (erreur) {
-    console.error(erreur);
-    message.textContent = 'Le tirage est momentanément indisponible.';
-    reessayer.hidden = false;
-  }
+'use strict';
+const message=document.getElementById('message');
+const reessayer=document.getElementById('reessayer');
+const reduire=window.matchMedia('(prefers-reduced-motion: reduce)');
+const attenteMinimum=reduire.matches?650:3800;
+let animationId=0;
+function demarrerPluie(){
+ if(reduire.matches)return;
+ const canvas=document.getElementById('pluie');
+ const contexte=canvas.getContext('2d');
+ if(!contexte)return;
+ const caracteres='0123456789✦◇⌁∴⋮';
+ let colonnes=[],taille=16,dernier=0;
+ function dimensions(){
+  const ratio=Math.min(window.devicePixelRatio||1,2);
+  canvas.width=Math.round(innerWidth*ratio);canvas.height=Math.round(innerHeight*ratio);
+  contexte.setTransform(ratio,0,0,ratio,0,0);
+  colonnes=Array.from({length:Math.ceil(innerWidth/taille)},()=>-Math.random()*innerHeight/taille);
+ }
+ dimensions();window.addEventListener('resize',dimensions,{passive:true});
+ function dessiner(t){
+  animationId=requestAnimationFrame(dessiner);
+  if(t-dernier<65)return;dernier=t;
+  contexte.fillStyle='rgba(23,17,25,.14)';contexte.fillRect(0,0,innerWidth,innerHeight);
+  contexte.font='13px monospace';contexte.fillStyle='rgba(232,187,126,.65)';
+  colonnes.forEach((y,i)=>{
+   contexte.fillText(caracteres[Math.floor(Math.random()*caracteres.length)],i*taille,y*taille);
+   colonnes[i]=y*taille>innerHeight&&Math.random()>.976?0:y+.38;
+  });
+ }
+ animationId=requestAnimationFrame(dessiner);
 }
-reessayer.addEventListener('click', tirer);
+demarrerPluie();
+const patienter=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+async function tirer(){
+ reessayer.hidden=true;
+ document.body.classList.remove('depart');
+ message.textContent='Le hasard feuillette la bibliothèque…';
+ const debut=performance.now();
+ try{
+  const reponse=await fetch('index-archives.json',{cache:'no-store'});
+  if(!reponse.ok)throw new Error('Index indisponible');
+  const donnees=await reponse.json();
+  const numeros=Object.entries(donnees)
+   .filter(([numero,archive])=>/^\d+$/.test(numero)&&archive&&typeof archive==='object')
+   .map(([numero])=>numero);
+  if(!numeros.length)throw new Error('Aucune archive disponible');
+  const numero=numeros[Math.floor(Math.random()*numeros.length)];
+  const url=new URL('archive.html',location.href);
+  url.searchParams.set('archive',numero);
+  url.searchParams.set('surprise','1');
+  await patienter(Math.max(0,attenteMinimum-(performance.now()-debut)));
+  message.textContent='Le passage s’ouvre…';
+  document.body.classList.add('depart');
+  await patienter(reduire.matches?100:420);
+  cancelAnimationFrame(animationId);
+  location.replace(url.href);
+ }catch(erreur){
+  console.error(erreur);
+  message.textContent='Le tirage est momentanément indisponible.';
+  reessayer.hidden=false;
+ }
+}
+reessayer.addEventListener('click',tirer);
 tirer();
 </script>
 </body>
