@@ -71,7 +71,7 @@
 </head>
 <body>
   <header>
-    <a class="retour" href="index.html">← Retour à la bibliothèque</a>
+    <a class="retour" id="retour-bibliotheque" href="index.html">← Retour à la bibliothèque</a>
     <h1>Explorer les archives</h1>
     <p class="aide">Retrouvez toutes les explorations par numéro ou par thématique.</p>
   </header>
@@ -97,6 +97,24 @@
     const recherche = document.getElementById('recherche');
     const indication = document.getElementById('indication');
     const retourThemes = document.getElementById('retour-themes');
+    const retourBibliotheque = document.getElementById('retour-bibliotheque');
+
+    // Retour à la page précédente du site, sans envoyer vers un site externe.
+    // En accès direct ou depuis un autre site, retour classique à l'accueil.
+    retourBibliotheque.addEventListener('click', (evenement) => {
+      let precedentInterne = false;
+      try {
+        const precedente = new URL(document.referrer);
+        precedentInterne = precedente.origin === location.origin &&
+          precedente.pathname !== location.pathname;
+      } catch (_) {
+        // Aucun référent exploitable : le lien index.html reste fonctionnel.
+      }
+      if (precedentInterne && history.length > 1) {
+        evenement.preventDefault();
+        history.back();
+      }
+    });
 
     let archives = [];
     let themes = [];
