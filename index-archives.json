@@ -287,6 +287,14 @@
     "miniature": "miniatures/195.webp",
     "thematique": "institutions"
   },
+  "20": {
+    "numero": 20,
+    "titre": "Les étranges créatures du musée Cryptid de Thomas Merrylin",
+    "sousTitre": "",
+    "source": "Les Miss Terres",
+    "miniature": "miniatures/20.webp",
+    "thematique": "fantastique"
+  },
   "19": {
     "numero": 19,
     "titre": "Actuellement beaucoup d'êtres désincarnés cherchent à se libérer !",
