@@ -470,6 +470,14 @@
       .retour-haut { transition: none; }
     }
     .menu-exploration .separateur-menu { border-top: 1px solid #70533e; margin: 6px 10px; }
+
+    .menu-exploration nav {
+      max-height: var(--menu-espace, 70vh);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      max-width: calc(100vw - 40px);
+    }
+    .menu-exploration.vers-haut nav { top: auto; bottom: 100%; }
   </style>
 </head>
 
@@ -880,6 +888,22 @@ function afficherPagination(nombrePages) {
 
   // Fermer le menu hamburger au clic extérieur
   const menuExploration = document.querySelector(".menu-exploration");
+  const panneauMenu = menuExploration.querySelector("nav");
+  function positionnerMenu() {
+    if (!menuExploration.open) return;
+    const rect = menuExploration.querySelector("summary").getBoundingClientRect();
+    const hauteur = document.documentElement.clientHeight;
+    const haut = Math.max(0, rect.top - 12);
+    const bas = Math.max(0, hauteur - rect.bottom - 12);
+    const necessaire = panneauMenu.scrollHeight + 2;
+    const versHaut = necessaire > bas && haut > bas;
+    menuExploration.classList.toggle("vers-haut", versHaut);
+    panneauMenu.style.setProperty("--menu-espace", `${Math.max(0, versHaut ? haut : bas)}px`);
+  }
+  menuExploration.addEventListener("toggle", positionnerMenu);
+  window.addEventListener("resize", positionnerMenu);
+  window.addEventListener("scroll", positionnerMenu, { passive: true });
+
   
   document.addEventListener("click", (evenement) => {
     if (
