@@ -380,7 +380,19 @@
     @media (prefers-reduced-motion: reduce) {
       .navigation-rapide button { transition: none; }
     }
-  </style>
+  
+/* Lecture : justification sur ordinateur uniquement */
+#resume-intro, #resume-suite {
+  text-align: justify;
+  hyphens: auto;
+}
+@media (max-width: 600px) {
+  #resume-intro, #resume-suite {
+    text-align: left;
+    hyphens: none;
+  }
+}
+</style>
 </head>
 
 <body>
