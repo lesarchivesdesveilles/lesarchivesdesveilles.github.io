@@ -295,11 +295,19 @@
     "miniature": "miniatures/195.webp",
     "thematique": "institutions"
   },
+  "24": {
+    "numero": 24,
+    "titre": "Les géants",
+    "sousTitre": "Mythe ou réalité ?",
+    "source": "Margo AuxAilesDeSoi",
+    "miniature": "miniatures/24.webp",
+    "thematique": "fantastique"
+  },
   "23": {
     "numero": 23,
     "titre": "Les dragons",
     "sousTitre": "Les gardiens oubliés de l'humanité",
-    "source": "Source : Eléonore & Pascal",
+    "source": "Eléonore & Pascal",
     "miniature": "miniatures/23.webp",
     "thematique": "fantastique"
   },
