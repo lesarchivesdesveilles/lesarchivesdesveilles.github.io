@@ -1,4 +1,12 @@
 {
+  "231": {
+    "numero": 231,
+    "titre": "GTA 6",
+    "sousTitre": "L'empreinte de la simulation",
+    "source": "Hypnose Team",
+    "miniature": "miniatures/231.webp",
+    "thematique": "matrice"
+  },
   "230": {
     "numero": 230,
     "titre": "Les lois de la matrice",
