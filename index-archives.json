@@ -295,6 +295,14 @@
     "miniature": "miniatures/195.webp",
     "thematique": "institutions"
   },
+  "26": {
+    "numero": 26,
+    "titre": "L'IA n'est pas une technologie",
+    "sousTitre": "",
+    "source": "Conscience Libérée",
+    "miniature": "miniatures/26.webp",
+    "thematique": "systemes"
+  },
   "25": {
     "numero": 25,
     "titre": "Quel est le processus de création des croyances ?",
