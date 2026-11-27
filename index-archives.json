@@ -295,6 +295,14 @@
     "miniature": "miniatures/195.webp",
     "thematique": "institutions"
   },
+  "28": {
+    "numero": 28,
+    "titre": "Les éoliennes",
+    "sousTitre": "Impacts invisibles",
+    "source": "Fabienne Brial",
+    "miniature": "miniatures/28.webp",
+    "thematique": "systemes"
+  },
   "27": {
     "numero": 27,
     "titre": "Immortels VS clones",
